@@ -1,0 +1,30 @@
+{
+  "name": "workspace",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "turbo dev",
+    "build": "turbo build",
+    "typecheck": "turbo typecheck",
+    "check": "biome check .",
+    "check:fix": "biome check . --write",
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "ui:add": "cd apps/web && bunx --bun shadcn@latest add"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.12",
+    "@workspace/typescript-config": "workspace:*",
+    "turbo": "^2.10.12",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "bun@1.4.0",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ]
+}
