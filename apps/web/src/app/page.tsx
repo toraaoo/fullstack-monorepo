@@ -1,13 +1,13 @@
 import { ArrowUpRightIcon } from "@phosphor-icons/react/ssr"
 import { dehydrate, HydrationBoundary } from "@tanstack/react-query"
-import { healthQueries } from "@workspace/api-client"
+import { healthQueries } from "@workspace/client/react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import { AccessForm } from "@/components/access-form"
 import { StackManifest } from "@/components/stack-manifest"
 import { SystemStatus } from "@/components/system-status"
 import { getServerApiClient } from "@/lib/api/client"
-import { env } from "@/lib/env"
+import { publicApiOrigin } from "@/lib/env"
 import { getServerLocale } from "@/lib/i18n/server"
 import { m } from "@/lib/paraglide/messages"
 import { getQueryClient } from "@/lib/query/client"
@@ -18,7 +18,7 @@ export default async function Page() {
   const queryClient = getQueryClient()
 
   await queryClient.prefetchQuery(
-    healthQueries.readiness(getServerApiClient(locale))
+    healthQueries.check(getServerApiClient(locale))
   )
 
   return (
@@ -53,7 +53,7 @@ export default async function Page() {
             nativeButton={false}
             render={
               <a
-                href={`${env.NEXT_PUBLIC_API_URL}/docs`}
+                href={`${publicApiOrigin()}/docs`}
                 target="_blank"
                 rel="noreferrer"
               />

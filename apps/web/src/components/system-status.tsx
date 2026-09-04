@@ -2,7 +2,8 @@
 
 import { ArrowsClockwiseIcon } from "@phosphor-icons/react"
 import { useQuery } from "@tanstack/react-query"
-import { ApiError, healthQueries } from "@workspace/api-client"
+import { ApiError } from "@workspace/client"
+import { healthQueries } from "@workspace/client/react"
 import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import * as React from "react"
@@ -22,7 +23,7 @@ const STATE_TONE: Record<ProbeState, string> = {
 
 export function SystemStatus({ locale }: { locale: Locale }) {
   const client = getApiClient(locale)
-  const query = useQuery(healthQueries.readiness(client))
+  const query = useQuery(healthQueries.check(client))
   const [refreshing, setRefreshing] = React.useState(false)
 
   const unreachable =
@@ -127,7 +128,7 @@ export function SystemStatus({ locale }: { locale: Locale }) {
           </p>
         ) : null}
         <p className="pt-1 font-mono text-[0.6875rem] text-muted-foreground/70 tracking-wide">
-          {m.status_endpoint({ path: `${client.origin}/health` }, { locale })}
+          {m.status_endpoint({ path: `${client.baseUrl}/health` }, { locale })}
           {query.dataUpdatedAt ? (
             <>
               {" · "}

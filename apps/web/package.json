@@ -5,17 +5,17 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:i18n": "paraglide-js compile --watch",
+    "dev:i18n": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy cookie preferredLanguage baseLocale --emit-ts-declarations --watch",
     "build": "bun run i18n && next build",
     "start": "next start",
     "typecheck": "bun run i18n && tsc --noEmit",
-    "i18n": "paraglide-js compile"
+    "i18n": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide --strategy cookie preferredLanguage baseLocale --emit-ts-declarations"
   },
   "dependencies": {
     "@phosphor-icons/react": "^2.1.10",
     "@tanstack/react-form": "^1.33.5",
     "@tanstack/react-query": "^5.102.8",
-    "@workspace/api-client": "workspace:*",
+    "@workspace/client": "workspace:*",
     "@workspace/ui": "workspace:*",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
