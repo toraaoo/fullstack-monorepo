@@ -17,7 +17,7 @@ import { I18N_HEADERS, I18N_QUERY_PARAMS } from "./i18n.constants"
         "en-*": "en",
       },
       loaderOptions: {
-        path: join(process.cwd(), "src", "core", "i18n", "lang"),
+        path: join(__dirname, "lang"),
         watch: getEnv().NODE_ENV !== "production",
       },
       resolvers: [
