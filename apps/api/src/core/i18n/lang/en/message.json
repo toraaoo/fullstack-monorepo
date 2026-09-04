@@ -1,0 +1,15 @@
+{
+  "common": {
+    "success": "Success",
+    "internal_error": "Internal Server Error",
+    "error": "An error occurred",
+    "unprocessable_entity": "Unprocessable Entity",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden",
+    "not_found": "Resource not found",
+    "too_many_requests": "Too Many Requests"
+  },
+  "app": {
+    "welcome": "Welcome to {appName}"
+  }
+}

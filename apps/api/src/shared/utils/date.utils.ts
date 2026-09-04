@@ -1,0 +1,241 @@
+import { getEnv } from "@core/config"
+import dayjs from "dayjs"
+import advancedFormat from "dayjs/plugin/advancedFormat"
+import relativeTime from "dayjs/plugin/relativeTime"
+import timezone from "dayjs/plugin/timezone"
+import utc from "dayjs/plugin/utc"
+
+// Initialize dayjs plugins
+dayjs.extend(utc)
+dayjs.extend(timezone)
+dayjs.extend(relativeTime)
+dayjs.extend(advancedFormat)
+
+export class DateUtils {
+  private static _configuredTimezone: string = (() => {
+    try {
+      return getEnv().APP_TIMEZONE ?? "UTC"
+    } catch {
+      return "UTC"
+    }
+  })()
+
+  static now(): dayjs.Dayjs {
+    return dayjs().tz(DateUtils._configuredTimezone)
+  }
+
+  static today(): dayjs.Dayjs {
+    return dayjs().tz(DateUtils._configuredTimezone).startOf("day")
+  }
+
+  static tomorrow(): dayjs.Dayjs {
+    return dayjs()
+      .tz(DateUtils._configuredTimezone)
+      .add(1, "day")
+      .startOf("day")
+  }
+
+  static yesterday(): dayjs.Dayjs {
+    return dayjs()
+      .tz(DateUtils._configuredTimezone)
+      .subtract(1, "day")
+      .startOf("day")
+  }
+
+  /* Parses a string that already carries an offset (an ISO timestamp) and
+	   re-presents it in the configured timezone.
+
+	   NOT for offset-less input. `dayjs(str)` reads a bare "YYYY-MM-DD" in the
+	   HOST timezone, and `.tz()` only re-presents that instant — it does not
+	   reinterpret the input as being in the configured zone. So on a host whose
+	   timezone is ahead of APP_TIMEZONE the value lands on the previous day.
+	   Use parseInZone for anything a user typed. */
+  static parse(dateString: string): dayjs.Dayjs {
+    return dayjs(dateString).tz(DateUtils._configuredTimezone)
+  }
+
+  /* Parses an offset-less string AS a wall-clock time in the configured
+	   timezone — "2024-03-05" means midnight on 5 March there, whatever the host
+	   is set to. This is what user-supplied dates need. */
+  static parseInZone(dateString: string): dayjs.Dayjs {
+    return dayjs.tz(dateString, DateUtils._configuredTimezone)
+  }
+
+  static format(date: dayjs.Dayjs, formatString: string): string {
+    return date.tz(DateUtils._configuredTimezone).format(formatString)
+  }
+
+  static addDays(date: dayjs.Dayjs, days: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).add(days, "day")
+  }
+
+  static subDays(date: dayjs.Dayjs, days: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).subtract(days, "day")
+  }
+
+  static addMonths(date: dayjs.Dayjs, months: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).add(months, "month")
+  }
+
+  static subMonths(date: dayjs.Dayjs, months: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).subtract(months, "month")
+  }
+
+  static addYears(date: dayjs.Dayjs, years: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).add(years, "year")
+  }
+
+  static subYears(date: dayjs.Dayjs, years: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).subtract(years, "year")
+  }
+
+  static addHours(date: dayjs.Dayjs, hours: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).add(hours, "hour")
+  }
+
+  static subHours(date: dayjs.Dayjs, hours: number): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).subtract(hours, "hour")
+  }
+
+  static startOfDay(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).startOf("day")
+  }
+
+  static endOfDay(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).endOf("day")
+  }
+
+  static startOfMonth(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).startOf("month")
+  }
+
+  static endOfMonth(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).endOf("month")
+  }
+
+  static startOfYear(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).startOf("year")
+  }
+
+  static endOfYear(date: dayjs.Dayjs): dayjs.Dayjs {
+    return date.tz(DateUtils._configuredTimezone).endOf("year")
+  }
+
+  static isBefore(date: dayjs.Dayjs, comparisonDate: dayjs.Dayjs): boolean {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .isBefore(comparisonDate.tz(DateUtils._configuredTimezone))
+  }
+
+  static isAfter(date: dayjs.Dayjs, comparisonDate: dayjs.Dayjs): boolean {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .isAfter(comparisonDate.tz(DateUtils._configuredTimezone))
+  }
+
+  static isToday(date: dayjs.Dayjs): boolean {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .isSame(dayjs().tz(DateUtils._configuredTimezone), "day")
+  }
+
+  static isTomorrow(date: dayjs.Dayjs): boolean {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .isSame(dayjs().tz(DateUtils._configuredTimezone).add(1, "day"), "day")
+  }
+
+  static isYesterday(date: dayjs.Dayjs): boolean {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .isSame(
+        dayjs().tz(DateUtils._configuredTimezone).subtract(1, "day"),
+        "day"
+      )
+  }
+
+  static isValid(
+    date: string | number | dayjs.Dayjs | Date | null | undefined
+  ): boolean {
+    return dayjs(date).isValid()
+  }
+
+  static differenceInDays(date1: dayjs.Dayjs, date2: dayjs.Dayjs): number {
+    return date1
+      .tz(DateUtils._configuredTimezone)
+      .diff(date2.tz(DateUtils._configuredTimezone), "day")
+  }
+
+  static differenceInHours(date1: dayjs.Dayjs, date2: dayjs.Dayjs): number {
+    return date1
+      .tz(DateUtils._configuredTimezone)
+      .diff(date2.tz(DateUtils._configuredTimezone), "hour")
+  }
+
+  static differenceInMinutes(date1: dayjs.Dayjs, date2: dayjs.Dayjs): number {
+    return date1
+      .tz(DateUtils._configuredTimezone)
+      .diff(date2.tz(DateUtils._configuredTimezone), "minute")
+  }
+
+  static differenceInSeconds(date1: dayjs.Dayjs, date2: dayjs.Dayjs): number {
+    return date1
+      .tz(DateUtils._configuredTimezone)
+      .diff(date2.tz(DateUtils._configuredTimezone), "second")
+  }
+
+  static distanceToNow(date: dayjs.Dayjs): string {
+    return date.tz(DateUtils._configuredTimezone).fromNow()
+  }
+
+  static getDate(date: dayjs.Dayjs): string {
+    return date.tz(DateUtils._configuredTimezone).format("D MMMM YYYY")
+  }
+
+  static getTime(date: dayjs.Dayjs): string {
+    return date.tz(DateUtils._configuredTimezone).format("HH:mm")
+  }
+
+  static getDateHuman(date: dayjs.Dayjs): string {
+    return date.tz(DateUtils._configuredTimezone).fromNow()
+  }
+
+  static getDateInformative(date: dayjs.Dayjs): string {
+    return date.tz(DateUtils._configuredTimezone).format("dddd, MMMM D, YYYY")
+  }
+
+  static getDateTimeInformative(date: dayjs.Dayjs): string {
+    return date
+      .tz(DateUtils._configuredTimezone)
+      .format("dddd, MMMM D, YYYY HH:mm")
+  }
+
+  // These methods already accept timezone as a parameter, so we keep them as is
+  static getDateWithTimezone(date: dayjs.Dayjs, tz: string): string {
+    return date.tz(tz).format("D MMMM YYYY")
+  }
+
+  static getDateTimeWithTimezone(date: dayjs.Dayjs, tz: string): string {
+    return date.tz(tz).format("D MMMM YYYY HH:mm z")
+  }
+
+  static getDateInformativeWithTimezone(date: dayjs.Dayjs, tz: string): string {
+    return date.tz(tz).format("dddd, MMMM D, YYYY z")
+  }
+
+  static getDateTimeInformativeWithTimezone(
+    date: dayjs.Dayjs,
+    tz?: string
+  ): string {
+    if (!tz) {
+      tz = DateUtils._configuredTimezone
+    }
+
+    return date.tz(tz).format("dddd, MMMM D, YYYY HH:mm z")
+  }
+
+  // Add a utility method to get the configured timezone
+  static getConfiguredTimezone(): string {
+    return DateUtils._configuredTimezone
+  }
+}

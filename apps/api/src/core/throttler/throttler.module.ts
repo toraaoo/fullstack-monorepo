@@ -1,0 +1,28 @@
+import { getEnv } from "@core/config"
+import { Module } from "@nestjs/common"
+import { APP_GUARD } from "@nestjs/core"
+import {
+  ThrottlerModule as NodeThrottlerModule,
+  seconds,
+  ThrottlerGuard,
+} from "@nestjs/throttler"
+
+@Module({
+  imports: [
+    NodeThrottlerModule.forRoot({
+      throttlers: [
+        {
+          ttl: seconds(getEnv().THROTTLER_TTL),
+          limit: getEnv().THROTTLER_LIMIT,
+        },
+      ],
+    }),
+  ],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+  ],
+})
+export class ThrottlerModule {}

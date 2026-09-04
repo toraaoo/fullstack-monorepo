@@ -1,0 +1,20 @@
+{
+  "required": "The {property} field is required.",
+  "invalid_type": "The {property} field must be of type {expected}.",
+  "invalid_value": "The {property} field has an invalid value.",
+  "too_small": "The {property} field is too small.",
+  "too_big": "The {property} field is too large.",
+  "not_multiple_of": "The {property} field must be a multiple of {divisor}.",
+  "unrecognized_keys": "Unrecognized field(s) in the request body.",
+  "invalid_union": "The {property} field has an invalid value.",
+  "invalid_key": "The {property} field has an invalid key.",
+  "invalid_element": "The {property} field has an invalid element.",
+  "custom": "The {property} field is invalid.",
+  "format": {
+    "email": "The {property} field must be a valid email address.",
+    "url": "The {property} field must be a valid URL.",
+    "uuid": "The {property} field must be a valid UUID.",
+    "datetime": "The {property} field must be a valid date-time.",
+    "regex": "The {property} field has an invalid format."
+  }
+}
