@@ -40,8 +40,8 @@ export function getEnv(): IEnvConfig {
   const env = cleanEnv(process.env, {
     APP_NAME: str({ default: "API" }),
     APP_VERSION: str({ default: "1.0.0" }),
-    APP_PORT: port({ default: 8001 }),
-    APP_URL: str({ default: "http://localhost:8001" }),
+    APP_PORT: port({ default: 8000 }),
+    APP_URL: str({ default: "http://localhost:8000" }),
     APP_TIMEZONE: str({ default: "UTC" }),
     NODE_ENV: str({
       choices: ["development", "dev", "staging", "production", "test"],
@@ -76,6 +76,14 @@ export function getEnv(): IEnvConfig {
       .map((item) => item.trim())
       .filter(Boolean)
 
+  const allowedOrigins = list(env.ALLOWED_ORIGINS)
+
+  if (allowedOrigins.includes("*") && !isDevelopment(env.NODE_ENV)) {
+    throw new Error(
+      `ALLOWED_ORIGINS is "*" with NODE_ENV=${env.NODE_ENV}. A wildcard origin is rejected by browsers when CREDENTIALS is true, and lets any site read this API's responses when it is false. List the web origins allowed to call this API.`
+    )
+  }
+
   _cachedEnv = {
     APP_NAME: env.APP_NAME,
     APP_VERSION: env.APP_VERSION,
@@ -95,7 +103,7 @@ export function getEnv(): IEnvConfig {
     THROTTLER_TTL: env.THROTTLER_TTL,
     THROTTLER_LIMIT: env.THROTTLER_LIMIT,
 
-    ALLOWED_ORIGINS: list(env.ALLOWED_ORIGINS),
+    ALLOWED_ORIGINS: allowedOrigins,
     ALLOWED_METHODS: list(env.ALLOWED_METHODS),
     ALLOWED_HEADERS: list(env.ALLOWED_HEADERS),
     MAX_AGE: env.MAX_AGE,
