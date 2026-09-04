@@ -24,6 +24,7 @@
     "@nestjs/terminus": "^12.0.0",
     "@nestjs/throttler": "^6.5.0",
     "@scalar/nestjs-api-reference": "^1.2.14",
+    "@workspace/schemas": "workspace:*",
     "dayjs": "^1.11.23",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",

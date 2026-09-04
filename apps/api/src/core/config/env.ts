@@ -8,6 +8,7 @@ interface IEnvConfig {
   APP_TIMEZONE: string
   NODE_ENV: "development" | "dev" | "staging" | "production" | "test"
   API_DOCS_ENABLED: boolean
+  API_DEBUG_ERRORS: boolean
   LOG_LEVEL: string
 
   DATABASE_URL: string
@@ -25,6 +26,12 @@ interface IEnvConfig {
   CREDENTIALS: boolean
 }
 
+const DEVELOPMENT_ENVS = ["development", "dev", "test"]
+
+export function isDevelopment(nodeEnv: string): boolean {
+  return DEVELOPMENT_ENVS.includes(nodeEnv)
+}
+
 let _cachedEnv: IEnvConfig | null = null
 
 export function getEnv(): IEnvConfig {
@@ -38,9 +45,10 @@ export function getEnv(): IEnvConfig {
     APP_TIMEZONE: str({ default: "UTC" }),
     NODE_ENV: str({
       choices: ["development", "dev", "staging", "production", "test"],
-      default: "development",
+      default: "production",
     }),
     API_DOCS_ENABLED: bool({ default: false }),
+    API_DEBUG_ERRORS: bool({ default: undefined }),
 
     LOG_LEVEL: str({
       choices: ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
@@ -76,6 +84,7 @@ export function getEnv(): IEnvConfig {
     APP_TIMEZONE: env.APP_TIMEZONE,
     NODE_ENV: env.NODE_ENV,
     API_DOCS_ENABLED: env.API_DOCS_ENABLED,
+    API_DEBUG_ERRORS: env.API_DEBUG_ERRORS ?? isDevelopment(env.NODE_ENV),
     LOG_LEVEL: env.LOG_LEVEL,
 
     DATABASE_URL: env.DATABASE_URL,

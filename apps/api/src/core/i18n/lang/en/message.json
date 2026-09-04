@@ -4,10 +4,13 @@
     "internal_error": "Internal Server Error",
     "error": "An error occurred",
     "unprocessable_entity": "Unprocessable Entity",
+    "bad_request": "Bad Request",
     "unauthorized": "Unauthorized",
     "forbidden": "Forbidden",
     "not_found": "Resource not found",
-    "too_many_requests": "Too Many Requests"
+    "conflict": "Conflict",
+    "too_many_requests": "Too Many Requests",
+    "service_unavailable": "Service Unavailable"
   },
   "app": {
     "welcome": "Welcome to {appName}"

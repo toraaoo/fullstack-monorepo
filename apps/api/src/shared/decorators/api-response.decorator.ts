@@ -1,253 +1,161 @@
 import { applyDecorators } from "@nestjs/common"
+import { ApiResponse } from "@nestjs/swagger"
 import {
-  ApiBadRequestResponse,
-  ApiForbiddenResponse,
-  ApiInternalServerErrorResponse,
-  ApiNotFoundResponse,
-  ApiResponse,
-  ApiServiceUnavailableResponse,
-  ApiUnauthorizedResponse,
-  ApiUnprocessableEntityResponse,
-} from "@nestjs/swagger"
+  type ErrorCode,
+  errorCodes,
+  errorResponseSchema,
+  successResponseOf,
+} from "@workspace/schemas/http"
+import type { z } from "zod"
+import { z as zod } from "zod"
 
 type ApiResponseSchema = Extract<
   NonNullable<Parameters<typeof ApiResponse>[0]>,
   { schema: unknown }
 >["schema"]
 
-interface ApiStandardResponsesOptions {
-  badRequest?: boolean
-  unauthorized?: boolean
-  forbidden?: boolean
-  validation?: boolean
-  tooManyRequests?: boolean
-  internalServerError?: boolean
-  serviceUnavailable?: boolean
+const toSchema = (schema: z.ZodType): ApiResponseSchema =>
+  zod.toJSONSchema(schema, {
+    target: "openapi-3.0",
+    io: "output",
+  }) as ApiResponseSchema
+
+const ERROR_SCHEMA = toSchema(errorResponseSchema)
+
+type ErrorSpec = {
+  status: number
+  code: ErrorCode
+  description: string
+}
+
+const ERRORS = {
+  badRequest: {
+    status: 400,
+    code: errorCodes.badRequest,
+    description: "Bad Request",
+  },
+  unauthorized: {
+    status: 401,
+    code: errorCodes.unauthorized,
+    description: "Unauthorized",
+  },
+  forbidden: {
+    status: 403,
+    code: errorCodes.forbidden,
+    description: "Forbidden",
+  },
+  notFound: {
+    status: 404,
+    code: errorCodes.notFound,
+    description: "Resource not found",
+  },
+  conflict: {
+    status: 409,
+    code: errorCodes.conflict,
+    description: "Conflict",
+  },
+  validation: {
+    status: 422,
+    code: errorCodes.validationFailed,
+    description: "Validation failed",
+  },
+  tooManyRequests: {
+    status: 429,
+    code: errorCodes.tooManyRequests,
+    description: "Too Many Requests",
+  },
+  internalServerError: {
+    status: 500,
+    code: errorCodes.internalError,
+    description: "Internal Server Error",
+  },
+  serviceUnavailable: {
+    status: 503,
+    code: errorCodes.serviceUnavailable,
+    description: "Service Unavailable",
+  },
+} satisfies Record<string, ErrorSpec>
+
+type ErrorName = keyof typeof ERRORS
+
+const DEFAULT_ERRORS: Record<ErrorName, boolean> = {
+  badRequest: true,
+  unauthorized: true,
+  forbidden: true,
+  notFound: false,
+  conflict: false,
+  validation: true,
+  tooManyRequests: true,
+  internalServerError: true,
+  serviceUnavailable: false,
+}
+
+function errorExample(spec: ErrorSpec, message = spec.description) {
+  return {
+    success: false,
+    code: spec.code,
+    message,
+    error:
+      spec.code === errorCodes.validationFailed
+        ? {
+            message,
+            fields: { email: ["The email field is required."] },
+          }
+        : { message },
+  }
+}
+
+export const ApiErrorResponse = (name: ErrorName) => {
+  const spec = ERRORS[name]
+
+  return ApiResponse({
+    status: spec.status,
+    description: spec.description,
+    schema: { ...ERROR_SCHEMA, example: errorExample(spec) },
+  })
 }
 
 export const ApiStandardResponses = (
-  options: ApiStandardResponsesOptions = {}
+  options: Partial<Record<ErrorName, boolean>> = {}
 ) => {
-  const {
-    badRequest = true,
-    unauthorized = true,
-    forbidden = true,
-    validation = true,
-    tooManyRequests = true,
-    internalServerError = true,
-    serviceUnavailable = true,
-  } = options
+  const enabled = { ...DEFAULT_ERRORS, ...options }
+  const names = Object.keys(ERRORS) as ErrorName[]
 
-  const decorators: Array<MethodDecorator & ClassDecorator> = []
-
-  if (validation) {
-    decorators.push(
-      ApiUnprocessableEntityResponse({
-        description: "Validation failed",
-        schema: {
-          example: {
-            code: 422,
-            success: false,
-            message: "Validation error",
-            data: null,
-            error: {
-              field1: ["Error message 1", "Error message 2"],
-              field2: ["Error message 1"],
-            },
-          },
-          properties: {
-            status: { type: "number", example: 422 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Validation error" },
-            data: { type: "null", example: null },
-            error: {
-              type: "object",
-              additionalProperties: {
-                type: "array",
-                items: { type: "string", example: "Error message" },
-              },
-            },
-          },
-        },
-      })
-    )
-  }
-
-  if (badRequest) {
-    decorators.push(
-      ApiBadRequestResponse({
-        description: "Bad Request",
-        schema: {
-          example: {
-            code: 400,
-            success: false,
-            message: "Your request is invalid",
-            data: null,
-          },
-          properties: {
-            status: { type: "number", example: 400 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Bad Request" },
-            data: { type: "null", example: null },
-          },
-        },
-      })
-    )
-  }
-
-  if (unauthorized) {
-    decorators.push(
-      ApiUnauthorizedResponse({
-        description: "Unauthorized",
-        schema: {
-          example: {
-            message: "Unauthorized",
-            error: "Unauthorized",
-            statusCode: 401,
-          },
-          properties: {
-            status: { type: "number", example: 401 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Unauthorized" },
-          },
-        },
-      })
-    )
-  }
-
-  if (forbidden) {
-    decorators.push(
-      ApiForbiddenResponse({
-        description: "Forbidden",
-        schema: {
-          example: {
-            message: "Forbidden",
-            error: "Forbidden",
-            statusCode: 403,
-          },
-          properties: {
-            status: { type: "number", example: 403 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Forbidden" },
-          },
-        },
-      })
-    )
-  }
-
-  if (internalServerError) {
-    decorators.push(
-      ApiInternalServerErrorResponse({
-        description: "Internal server error",
-        schema: {
-          example: {
-            code: 500,
-            success: false,
-            message: "Internal Server Error",
-            data: null,
-          },
-          properties: {
-            status: { type: "number", example: 500 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Internal Server Error" },
-            data: { type: "null", example: null },
-          },
-        },
-      })
-    )
-  }
-
-  if (serviceUnavailable) {
-    decorators.push(
-      ApiServiceUnavailableResponse({
-        description: "Service Unavailable",
-        schema: {
-          example: {
-            code: 503,
-            success: false,
-            message: "Service Unavailable",
-            data: null,
-          },
-          properties: {
-            status: { type: "number", example: 503 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Service Unavailable" },
-            data: { type: "null", example: null },
-          },
-        },
-      })
-    )
-  }
-
-  if (tooManyRequests) {
-    decorators.push(
-      ApiResponse({
-        status: 429,
-        description: "Too Many Requests",
-        schema: {
-          example: {
-            code: 429,
-            success: false,
-            message: "Too Many Requests",
-            data: null,
-          },
-          properties: {
-            status: { type: "number", example: 429 },
-            success: { type: "boolean", example: false },
-            message: { type: "string", example: "Too Many Requests" },
-            data: { type: "null", example: null },
-          },
-        },
-      })
-    )
-  }
-
-  return applyDecorators(...decorators)
+  return applyDecorators(
+    ...names.filter((name) => enabled[name]).map(ApiErrorResponse)
+  )
 }
 
-export const ApiSuccessResponse = <T>(
+export const ApiSuccessResponse = <TData extends z.ZodType>(
   status: number,
   description: string,
-  example: T,
-  exampleProperties?: ApiResponseSchema
+  data: TData,
+  example?: z.infer<TData>
 ) => {
+  const schema = toSchema(successResponseOf(data))
+
   return ApiResponse({
     status,
     description,
-    schema: {
-      example: {
-        code: status,
-        success: true,
-        message: description,
-        data: example,
-      },
-      properties: {
-        status: { type: "number", example: status },
-        success: { type: "boolean", example: true },
-        message: { type: "string", example: description },
-        data: exampleProperties || {},
-      },
-    },
+    schema:
+      example === undefined
+        ? schema
+        : {
+            ...schema,
+            example: { success: true, message: description, data: example },
+          },
   })
 }
 
 export const DefaultApiNotFoundResponse = (entityName?: string) => {
-  return ApiNotFoundResponse({
-    description: `${entityName ?? "Entity"} not found`,
+  const message = `${entityName ?? "Entity"} not found`
+
+  return ApiResponse({
+    status: 404,
+    description: message,
     schema: {
-      example: {
-        message: `${entityName ?? "Entity"} not found`,
-        error: "Not Found",
-        statusCode: 404,
-      },
-      properties: {
-        status: { type: "number", example: 404 },
-        success: { type: "boolean", example: false },
-        message: {
-          type: "string",
-          example: `${entityName ?? "Entity"} not found`,
-        },
-      },
+      ...ERROR_SCHEMA,
+      example: errorExample(ERRORS.notFound, message),
     },
   })
 }

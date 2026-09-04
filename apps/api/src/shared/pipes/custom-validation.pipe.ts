@@ -1,4 +1,6 @@
 import { UnprocessableEntityException } from "@nestjs/common"
+import { errorCodes } from "@workspace/schemas/http"
+import { unwrapMessageKey } from "@workspace/schemas/i18n"
 import { I18nContext } from "nestjs-i18n"
 import { createZodValidationPipe } from "nestjs-zod"
 import { z } from "zod"
@@ -11,17 +13,13 @@ z.config({
 export const CustomValidationPipe = createZodValidationPipe({
   createValidationException: (error) => {
     const issues = (error as { issues?: $ZodIssue[] })?.issues ?? []
-    const formattedErrors = formatIssues(issues)
-    const fallback =
-      I18nContext.current()?.t("message.common.unprocessable_entity") ??
-      "Unprocessable Entity"
-    const firstMessage = Object.values(formattedErrors)[0]?.[0] || fallback
+    const fields = formatIssues(issues)
+    const firstMessage = Object.values(fields)[0]?.[0]
 
     return new UnprocessableEntityException({
-      statusCode: 422,
+      code: errorCodes.validationFailed,
       message: firstMessage,
-      data: null,
-      error: formattedErrors,
+      fields,
     })
   },
 })
@@ -32,11 +30,32 @@ function formatIssues(issues: $ZodIssue[]): Record<string, string[]> {
   for (const issue of issues) {
     const field = issue.path.length > 0 ? issue.path.join(".") : "_"
     const messages = formattedErrors[field] ?? []
-    messages.push(issue.message)
+    messages.push(resolveMessage(issue.message))
     formattedErrors[field] = messages
   }
 
   return formattedErrors
+}
+
+function resolveMessage(message: string): string {
+  const key = unwrapMessageKey(message)
+
+  if (!key) {
+    return message
+  }
+
+  const i18n = I18nContext.current()
+
+  if (!i18n) {
+    return message
+  }
+
+  const path = `validation.${key}`
+  const translated = i18n.t(path)
+
+  return typeof translated === "string" && translated !== path
+    ? translated
+    : message
 }
 
 function translateIssue(issue: $ZodIssue): string | undefined {

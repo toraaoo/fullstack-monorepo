@@ -5,10 +5,12 @@ import {
   HealthCheckService,
   MemoryHealthIndicator,
 } from "@nestjs/terminus"
+import { RawResponse } from "@shared"
 import { DatabaseHealth } from "./database.health"
 
 @Controller("health")
 @ApiTags("Health")
+@RawResponse()
 export class HealthController {
   constructor(
     private health: HealthCheckService,
