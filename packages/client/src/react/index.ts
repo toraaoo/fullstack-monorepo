@@ -2,7 +2,7 @@ import { queryOptions } from "@tanstack/react-query"
 import type { Client } from "../core/client"
 
 export function clientKey(client: Client) {
-  return ["api", client.baseUrl, client.locale ?? "default"] as const
+  return ["api", client.scope, client.locale ?? "default"] as const
 }
 
 export const healthKeys = {

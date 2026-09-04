@@ -32,6 +32,7 @@ export type RetryOptions = {
 
 export type ClientOptions = {
   baseUrl: string
+  scope?: string
   locale?: string
   headers?: HeaderSource
   timeout?: number
@@ -66,6 +67,7 @@ export type SendConfig = RequestOptions & {
 
 export type RequestContext = {
   readonly baseUrl: string
+  readonly scope: string
   readonly locale?: string
   readonly http: AxiosInstance
   fetch<TSchema extends z.ZodType>(

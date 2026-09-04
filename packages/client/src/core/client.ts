@@ -6,6 +6,7 @@ import type { ClientOptions, RequestContext } from "./types"
 
 export type Client = Resources & {
   readonly baseUrl: string
+  readonly scope: string
   readonly locale?: string
   readonly $http: AxiosInstance
   readonly $fetch: RequestContext["fetch"]
@@ -15,6 +16,7 @@ export type Client = Resources & {
 
 export function createClient(options: ClientOptions): Client {
   const baseUrl = normalizeBaseUrl(options.baseUrl)
+  const scope = options.scope ?? baseUrl
   const http = createHttp(options)
 
   const { fetch, send } = createRequester({
@@ -27,6 +29,7 @@ export function createClient(options: ClientOptions): Client {
 
   const context: RequestContext = {
     baseUrl,
+    scope,
     locale: options.locale,
     http,
     fetch,
@@ -43,6 +46,7 @@ export function createClient(options: ClientOptions): Client {
   return {
     ...resources,
     baseUrl,
+    scope,
     locale: options.locale,
     $http: http,
     $fetch: fetch,
