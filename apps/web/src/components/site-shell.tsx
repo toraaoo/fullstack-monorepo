@@ -21,7 +21,7 @@ export function SiteShell({
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
           <div className="flex min-w-0 items-center">
             <span className="truncate font-semibold text-[0.9375rem] tracking-tight">
-              {m.app_name({}, { locale })}
+              {m["app.name"]({}, { locale })}
             </span>
           </div>
 
@@ -37,7 +37,7 @@ export function SiteShell({
       <footer className="mx-auto w-full max-w-5xl px-6 pt-16 pb-10">
         <div className="border-border/60 border-t pt-6">
           <p className={cn("text-muted-foreground/70", MICRO_LABEL)}>
-            {m.footer_note({}, { locale })}
+            {m["app.footer.note"]({}, { locale })}
           </p>
         </div>
       </footer>

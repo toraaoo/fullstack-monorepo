@@ -1,0 +1,17 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "stack": {
+    "heading": "이미 연결된 구성",
+    "role": {
+      "web": "웹",
+      "api": "API",
+      "data": "데이터",
+      "i18n": "번역",
+      "state": "서버 상태",
+      "forms": "폼과 스키마",
+      "ui": "디자인 시스템",
+      "tooling": "도구"
+    }
+  }
+}

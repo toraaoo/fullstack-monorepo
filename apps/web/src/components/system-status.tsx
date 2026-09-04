@@ -47,24 +47,24 @@ export function SystemStatus({ locale }: { locale: Locale }) {
         : "down"
 
   const summary = query.isPending
-    ? m.status_summary_checking({}, { locale })
+    ? m["status.summary.checking"]({}, { locale })
     : unreachable || !report
-      ? m.status_summary_unreachable({}, { locale })
+      ? m["status.summary.unreachable"]({}, { locale })
       : report.status === "ok"
-        ? m.status_summary_ok({}, { locale })
-        : m.status_summary_degraded({}, { locale })
+        ? m["status.summary.ok"]({}, { locale })
+        : m["status.summary.degraded"]({}, { locale })
 
   const rows: Array<{ label: string; state: ProbeState }> = [
     {
-      label: m.status_probe_api({}, { locale }),
+      label: m["status.probe.api"]({}, { locale }),
       state: query.isPending ? "checking" : report ? "up" : "unknown",
     },
     {
-      label: m.status_probe_database({}, { locale }),
+      label: m["status.probe.database"]({}, { locale }),
       state: probe("database"),
     },
     {
-      label: m.status_probe_memory({}, { locale }),
+      label: m["status.probe.memory"]({}, { locale }),
       state: probe("memory_heap"),
     },
   ]
@@ -81,7 +81,7 @@ export function SystemStatus({ locale }: { locale: Locale }) {
             id="system-status-heading"
             className="truncate font-medium text-sm"
           >
-            {m.status_heading({}, { locale })}
+            {m["status.heading"]({}, { locale })}
           </h2>
         </div>
         <Button
@@ -97,7 +97,7 @@ export function SystemStatus({ locale }: { locale: Locale }) {
             weight="bold"
             className={cn(refreshing && "animate-spin")}
           />
-          {m.status_refresh({}, { locale })}
+          {m["status.refresh"]({}, { locale })}
         </Button>
       </header>
 
@@ -124,11 +124,14 @@ export function SystemStatus({ locale }: { locale: Locale }) {
         <p className="text-muted-foreground text-sm">{summary}</p>
         {unreachable ? (
           <p className="text-muted-foreground/80 text-xs">
-            {m.status_hint_unreachable({}, { locale })}
+            {m["status.hint.unreachable"]({}, { locale })}
           </p>
         ) : null}
         <p className="pt-1 font-mono text-[0.6875rem] text-muted-foreground/70 tracking-wide">
-          {m.status_endpoint({ path: `${client.baseUrl}/health` }, { locale })}
+          {m["status.endpoint"](
+            { path: `${client.baseUrl}/health` },
+            { locale }
+          )}
           {query.dataUpdatedAt ? (
             <>
               {" · "}
@@ -136,7 +139,7 @@ export function SystemStatus({ locale }: { locale: Locale }) {
                 dateTime={new Date(query.dataUpdatedAt).toISOString()}
                 suppressHydrationWarning
               >
-                {m.status_checked_at(
+                {m["status.checked_at"](
                   {
                     time: new Intl.DateTimeFormat(locale, {
                       timeStyle: "medium",
@@ -172,12 +175,12 @@ function StateDot({ state }: { state: ProbeState }) {
 function stateLabel(state: ProbeState, locale: Locale) {
   switch (state) {
     case "checking":
-      return m.status_state_checking({}, { locale })
+      return m["status.state.checking"]({}, { locale })
     case "up":
-      return m.status_state_up({}, { locale })
+      return m["status.state.up"]({}, { locale })
     case "down":
-      return m.status_state_down({}, { locale })
+      return m["status.state.down"]({}, { locale })
     default:
-      return m.status_state_unknown({}, { locale })
+      return m["status.state.unknown"]({}, { locale })
   }
 }

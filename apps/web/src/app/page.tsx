@@ -31,7 +31,7 @@ export default async function Page() {
           )}
         >
           <span aria-hidden className="h-px w-6 bg-border" />
-          {m.home_eyebrow({}, { locale })}
+          {m["home.eyebrow"]({}, { locale })}
         </p>
 
         <h1
@@ -40,11 +40,11 @@ export default async function Page() {
             DISPLAY_TEXT
           )}
         >
-          {m.home_title({}, { locale })}
+          {m["home.title"]({}, { locale })}
         </h1>
 
         <p className="mt-6 max-w-2xl text-pretty break-keep text-base text-muted-foreground leading-relaxed sm:text-lg">
-          {m.home_lede({}, { locale })}
+          {m["home.lede"]({}, { locale })}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-2.5">
@@ -59,7 +59,7 @@ export default async function Page() {
               />
             }
           >
-            {m.home_cta_docs({}, { locale })}
+            {m["home.cta.docs"]({}, { locale })}
             <ArrowUpRightIcon weight="bold" />
           </Button>
           <Button
@@ -68,7 +68,7 @@ export default async function Page() {
             nativeButton={false}
             render={<a href="#stack" />}
           >
-            {m.home_cta_repo({}, { locale })}
+            {m["home.cta.repo"]({}, { locale })}
           </Button>
         </div>
       </section>
@@ -86,10 +86,10 @@ export default async function Page() {
         >
           <div className="space-y-2">
             <h2 id="access-heading" className="font-medium text-sm">
-              {m.access_heading({}, { locale })}
+              {m["access.heading"]({}, { locale })}
             </h2>
             <p className="break-keep text-muted-foreground text-sm leading-relaxed">
-              {m.access_lede({}, { locale })}
+              {m["access.lede"]({}, { locale })}
             </p>
           </div>
 

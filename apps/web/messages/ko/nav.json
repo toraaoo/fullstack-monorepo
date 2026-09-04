@@ -1,0 +1,8 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "nav": {
+    "language": "언어",
+    "theme": "테마 전환"
+  }
+}

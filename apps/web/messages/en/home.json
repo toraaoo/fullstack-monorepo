@@ -1,0 +1,13 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "home": {
+    "eyebrow": "Turborepo workspace",
+    "title": "Next.js + NestJS monorepo",
+    "lede": "A front end, an API, a shared component library, and a typed client in one workspace. Everything below reads from the running API.",
+    "cta": {
+      "docs": "API reference",
+      "repo": "Read the setup"
+    }
+  }
+}

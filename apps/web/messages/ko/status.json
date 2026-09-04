@@ -1,0 +1,30 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "status": {
+    "heading": "실시간 상태 점검",
+    "endpoint": "GET {path}",
+    "refresh": "다시 확인",
+    "checked_at": "마지막 확인 {time}",
+    "probe": {
+      "api": "API 프로세스",
+      "database": "데이터베이스",
+      "memory": "메모리 힙"
+    },
+    "state": {
+      "checking": "확인 중",
+      "up": "정상",
+      "down": "중단",
+      "unknown": "값 없음"
+    },
+    "summary": {
+      "checking": "API를 확인하는 중…",
+      "ok": "모든 의존성이 정상입니다.",
+      "degraded": "API는 응답했지만 일부 의존성이 비정상입니다.",
+      "unreachable": "API가 응답하지 않습니다."
+    },
+    "hint": {
+      "unreachable": "bun run dev로 실행하거나 NEXT_PUBLIC_API_URL을 실행 중인 주소로 지정하세요."
+    }
+  }
+}

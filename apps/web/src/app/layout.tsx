@@ -20,8 +20,8 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getServerLocale()
 
   return {
-    title: m.app_name({}, { locale }),
-    description: m.home_lede({}, { locale }),
+    title: m["app.name"]({}, { locale }),
+    description: m["home.lede"]({}, { locale }),
   }
 }
 

@@ -1,0 +1,30 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "status": {
+    "heading": "Live system check",
+    "endpoint": "GET {path}",
+    "refresh": "Re-run",
+    "checked_at": "Last read {time}",
+    "probe": {
+      "api": "API process",
+      "database": "Database",
+      "memory": "Memory heap"
+    },
+    "state": {
+      "checking": "Checking",
+      "up": "Up",
+      "down": "Down",
+      "unknown": "No reading"
+    },
+    "summary": {
+      "checking": "Probing the API…",
+      "ok": "All dependencies reporting healthy.",
+      "degraded": "The API answered, but a dependency is unhealthy.",
+      "unreachable": "No answer from the API."
+    },
+    "hint": {
+      "unreachable": "Start it with bun run dev, or point NEXT_PUBLIC_API_URL at a running instance."
+    }
+  }
+}

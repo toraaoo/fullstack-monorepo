@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "app": {
+    "name": "모노레포 스캐폴드",
+    "footer": {
+      "note": "제품 이름이 정해지면 이 페이지를 교체하세요."
+    }
+  }
+}

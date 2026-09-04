@@ -1,0 +1,20 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "access": {
+    "heading": "Request access",
+    "lede": "The form is real: TanStack Form holds the state, Zod validates it, and the messages come from the same catalogue as the rest of this page.",
+    "submit": "Request access",
+    "submitting": "Sending…",
+    "accepted": "Validated {email} — but nothing was sent.",
+    "notice": "No endpoint is wired to this form yet. Submitting only proves the validation path.",
+    "email": {
+      "label": "Email address",
+      "placeholder": "you@company.com"
+    },
+    "error": {
+      "required": "Enter an email address.",
+      "invalid": "That is not a valid email address."
+    }
+  }
+}

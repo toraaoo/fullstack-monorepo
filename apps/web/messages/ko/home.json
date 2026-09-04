@@ -1,0 +1,13 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "home": {
+    "eyebrow": "Turborepo 워크스페이스",
+    "title": "Next.js + NestJS 모노레포",
+    "lede": "프런트엔드, API, 공용 컴포넌트 라이브러리, 타입이 붙은 클라이언트를 하나의 워크스페이스에 담았습니다. 아래 내용은 실행 중인 API에서 읽어옵니다.",
+    "cta": {
+      "docs": "API 레퍼런스",
+      "repo": "설치 안내 보기"
+    }
+  }
+}

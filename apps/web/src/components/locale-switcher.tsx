@@ -12,7 +12,7 @@ const LOCALE_LABELS: Record<Locale, string> = {
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
   return (
     <fieldset className="flex min-w-0 items-center gap-0.5 rounded-lg border border-border/70 p-0.5">
-      <legend className="sr-only">{m.nav_language({}, { locale })}</legend>
+      <legend className="sr-only">{m["nav.language"]({}, { locale })}</legend>
       {locales.map((candidate) => {
         const active = candidate === locale
 

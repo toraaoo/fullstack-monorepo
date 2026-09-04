@@ -1,0 +1,17 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "stack": {
+    "heading": "What is already wired",
+    "role": {
+      "web": "Web",
+      "api": "API",
+      "data": "Data",
+      "i18n": "Translation",
+      "state": "Server state",
+      "forms": "Forms and schemas",
+      "ui": "Design system",
+      "tooling": "Tooling"
+    }
+  }
+}

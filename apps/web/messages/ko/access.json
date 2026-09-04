@@ -1,0 +1,20 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "access": {
+    "heading": "액세스 요청",
+    "lede": "실제로 동작하는 폼입니다. TanStack Form이 상태를 관리하고 Zod가 검증하며, 문구는 이 페이지와 같은 카탈로그에서 가져옵니다.",
+    "submit": "액세스 요청",
+    "submitting": "보내는 중…",
+    "accepted": "{email} 검증 완료 — 전송된 내용은 없습니다.",
+    "notice": "아직 이 폼에 연결된 엔드포인트가 없습니다. 제출은 검증 경로만 확인합니다.",
+    "email": {
+      "label": "이메일 주소",
+      "placeholder": "you@company.com"
+    },
+    "error": {
+      "required": "이메일 주소를 입력하세요.",
+      "invalid": "올바른 이메일 주소가 아닙니다."
+    }
+  }
+}

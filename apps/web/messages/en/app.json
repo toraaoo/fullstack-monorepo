@@ -1,0 +1,10 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "app": {
+    "name": "Monorepo scaffold",
+    "footer": {
+      "note": "Replace this page when the product has a name."
+    }
+  }
+}

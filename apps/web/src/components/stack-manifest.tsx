@@ -4,14 +4,14 @@ import type { Locale } from "@/lib/paraglide/runtime"
 import { MICRO_LABEL } from "@/lib/typography"
 
 const ROWS = [
-  { role: "stack_role_web", parts: ["Next.js 16", "React 19"] },
-  { role: "stack_role_api", parts: ["NestJS 12", "Fastify 5"] },
-  { role: "stack_role_data", parts: ["Drizzle ORM", "PostgreSQL"] },
-  { role: "stack_role_i18n", parts: ["Paraglide JS", "nestjs-i18n"] },
-  { role: "stack_role_state", parts: ["TanStack Query"] },
-  { role: "stack_role_forms", parts: ["TanStack Form", "Zod 4"] },
-  { role: "stack_role_ui", parts: ["Tailwind CSS 4", "shadcn/ui", "Phosphor"] },
-  { role: "stack_role_tooling", parts: ["Turborepo", "Bun", "Biome"] },
+  { role: "stack.role.web", parts: ["Next.js 16", "React 19"] },
+  { role: "stack.role.api", parts: ["NestJS 12", "Express 5"] },
+  { role: "stack.role.data", parts: ["Drizzle ORM", "PostgreSQL"] },
+  { role: "stack.role.i18n", parts: ["Paraglide JS", "nestjs-i18n"] },
+  { role: "stack.role.state", parts: ["TanStack Query"] },
+  { role: "stack.role.forms", parts: ["TanStack Form", "Zod 4"] },
+  { role: "stack.role.ui", parts: ["Tailwind CSS 4", "shadcn/ui", "Phosphor"] },
+  { role: "stack.role.tooling", parts: ["Turborepo", "Bun", "Biome"] },
 ] as const
 
 export function StackManifest({ locale }: { locale: Locale }) {
@@ -25,7 +25,7 @@ export function StackManifest({ locale }: { locale: Locale }) {
         id="stack-heading"
         className={cn("text-muted-foreground", MICRO_LABEL)}
       >
-        {m.stack_heading({}, { locale })}
+        {m["stack.heading"]({}, { locale })}
       </h2>
 
       <dl className="mt-5 grid gap-x-12 border-border/70 border-t sm:grid-cols-2">

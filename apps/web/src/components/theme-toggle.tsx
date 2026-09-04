@@ -8,7 +8,7 @@ import type { Locale } from "@/lib/paraglide/runtime"
 
 export function ThemeToggle({ locale }: { locale: Locale }) {
   const { resolvedTheme, setTheme } = useTheme()
-  const label = m.nav_theme({}, { locale })
+  const label = m["nav.theme"]({}, { locale })
 
   return (
     <Button
