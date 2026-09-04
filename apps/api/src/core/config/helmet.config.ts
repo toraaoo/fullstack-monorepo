@@ -1,6 +1,8 @@
-import type { FastifyHelmetOptions } from "@fastify/helmet"
+import type helmet from "helmet"
 
-export const HelmetConfig: FastifyHelmetOptions = {
+type HelmetOptions = Parameters<typeof helmet>[0]
+
+export const HelmetConfig: HelmetOptions = {
   contentSecurityPolicy: {
     directives: {
       defaultSrc: ["'self'"],
@@ -17,7 +19,6 @@ export const HelmetConfig: FastifyHelmetOptions = {
       upgradeInsecureRequests: [],
     },
   },
-  global: true,
   hidePoweredBy: true,
   hsts: {
     maxAge: 31536000,
@@ -25,6 +26,6 @@ export const HelmetConfig: FastifyHelmetOptions = {
     preload: true,
   },
   noSniff: true,
-  xssFilter: true,
+  xXssProtection: true,
   referrerPolicy: { policy: "strict-origin-when-cross-origin" },
 }

@@ -109,9 +109,6 @@ export class StrUtils {
     return regex.test(subject)
   }
 
-  /* Character-code scan rather than a /[\u0000-\u007F]/ range: that form embeds
-     literal control characters in the pattern, which lints as an error and is
-     easy to get subtly wrong. */
   static isAscii(subject: string): boolean {
     for (let i = 0; i < subject.length; i++) {
       if (subject.charCodeAt(i) > 127) return false
@@ -202,7 +199,7 @@ export class StrUtils {
   }
 
   static plural(subject: string): string {
-    return `${subject}s` // Simple example, for demonstration only
+    return `${subject}s`
   }
 
   static singular(subject: string): string {

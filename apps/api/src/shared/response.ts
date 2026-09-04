@@ -1,7 +1,10 @@
-import { HttpException, UnprocessableEntityException } from "@nestjs/common"
-import { FastifyReply } from "fastify"
+import {
+  HttpException,
+  Logger,
+  UnprocessableEntityException,
+} from "@nestjs/common"
+import type { Response } from "express"
 import { I18nContext } from "nestjs-i18n"
-import { LoggerUtils } from "./utils/logger.utils"
 
 export class SuccessResponse<T> {
   constructor(
@@ -22,6 +25,8 @@ export class ErrorResponse {
 }
 
 export class ResponseHandler {
+  private static readonly logger = new Logger(ResponseHandler.name)
+
   static success<T>(
     statusCode: number,
     message: string = "Success",
@@ -34,7 +39,7 @@ export class ResponseHandler {
     return new ErrorResponse(statusCode, false, message)
   }
 
-  static handleError(res: FastifyReply, error: unknown): FastifyReply {
+  static handleError(res: Response, error: unknown): Response {
     const i18n = I18nContext.current()
 
     if (error instanceof HttpException) {
@@ -71,7 +76,10 @@ export class ResponseHandler {
       return res.status(status).send(this.error(status, String(message)))
     }
 
-    LoggerUtils.error(`Internal server error`, error)
+    ResponseHandler.logger.error(
+      { err: error },
+      "Unhandled error escaped to the 500 handler"
+    )
 
     return res
       .status(500)
@@ -84,8 +92,7 @@ export class ResponseHandler {
   }
 }
 
-// Backward compatibility exports
-export const errorResponse = (res: FastifyReply, error: unknown) => {
+export const errorResponse = (res: Response, error: unknown) => {
   return ResponseHandler.handleError(res, error)
 }
 

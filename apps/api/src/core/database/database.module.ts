@@ -1,26 +1,51 @@
-import { Module } from "@nestjs/common"
+import { Inject, Module, type OnApplicationShutdown } from "@nestjs/common"
+import { drizzle, type PostgresJsDatabase } from "drizzle-orm/postgres-js"
+import { PinoLogger } from "nestjs-pino"
+import postgres, { type Sql } from "postgres"
+import { getEnv } from "../config"
+import * as schema from "./database.schema"
 
-/* Seam for the database connection -- and only the connection. Register the
-   client here as a provider, export it, and import DatabaseModule from the
-   feature modules that need it.
+export const DRIZZLE = Symbol("DRIZZLE")
 
-   Repositories deliberately do not live here. Upstream keeps every schema and
-   every repository in one `libs/repositories` tree, which means a change to
-   users touches that tree and the users feature both. Instead a repository
-   belongs beside the feature that owns it:
+export type DrizzleDatabase = PostgresJsDatabase<typeof schema> & {
+  $client: Sql
+}
 
-     src/modules/users/
-       users.controller.ts
-       users.service.ts
-       users.repository.ts   <- injects the client from this module
-       users.schema.ts
-       dto/
+export type DatabaseExecutor =
+  | DrizzleDatabase
+  | Parameters<Parameters<DrizzleDatabase["transaction"]>[0]>[0]
 
-   When an ORM lands: register the connection below, give DATABASE_URL a real
-   (defaultless) declaration in src/core/config so a missing connection string fails
-   at boot, and add the db probe in src/health/health.controller.ts. */
 @Module({
-  providers: [],
-  exports: [],
+  providers: [
+    {
+      provide: DRIZZLE,
+      inject: [PinoLogger],
+      useFactory: (logger: PinoLogger): DrizzleDatabase => {
+        const env = getEnv()
+
+        const client = postgres(env.DATABASE_URL, {
+          max: env.DATABASE_POOL_MAX,
+          ssl: env.DATABASE_SSL,
+          prepare: env.DATABASE_PREPARE,
+        })
+
+        return drizzle(client, {
+          schema,
+          casing: "snake_case",
+          logger: {
+            logQuery: (query, params) =>
+              logger.debug({ query, params }, "drizzle query"),
+          },
+        })
+      },
+    },
+  ],
+  exports: [DRIZZLE],
 })
-export class DatabaseModule {}
+export class DatabaseModule implements OnApplicationShutdown {
+  constructor(@Inject(DRIZZLE) private readonly db: DrizzleDatabase) {}
+
+  async onApplicationShutdown(): Promise<void> {
+    await this.db.$client.end({ timeout: 5 })
+  }
+}

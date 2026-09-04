@@ -5,7 +5,6 @@ import relativeTime from "dayjs/plugin/relativeTime"
 import timezone from "dayjs/plugin/timezone"
 import utc from "dayjs/plugin/utc"
 
-// Initialize dayjs plugins
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)
@@ -42,21 +41,10 @@ export class DateUtils {
       .startOf("day")
   }
 
-  /* Parses a string that already carries an offset (an ISO timestamp) and
-	   re-presents it in the configured timezone.
-
-	   NOT for offset-less input. `dayjs(str)` reads a bare "YYYY-MM-DD" in the
-	   HOST timezone, and `.tz()` only re-presents that instant — it does not
-	   reinterpret the input as being in the configured zone. So on a host whose
-	   timezone is ahead of APP_TIMEZONE the value lands on the previous day.
-	   Use parseInZone for anything a user typed. */
   static parse(dateString: string): dayjs.Dayjs {
     return dayjs(dateString).tz(DateUtils._configuredTimezone)
   }
 
-  /* Parses an offset-less string AS a wall-clock time in the configured
-	   timezone — "2024-03-05" means midnight on 5 March there, whatever the host
-	   is set to. This is what user-supplied dates need. */
   static parseInZone(dateString: string): dayjs.Dayjs {
     return dayjs.tz(dateString, DateUtils._configuredTimezone)
   }
@@ -210,7 +198,6 @@ export class DateUtils {
       .format("dddd, MMMM D, YYYY HH:mm")
   }
 
-  // These methods already accept timezone as a parameter, so we keep them as is
   static getDateWithTimezone(date: dayjs.Dayjs, tz: string): string {
     return date.tz(tz).format("D MMMM YYYY")
   }
@@ -234,7 +221,6 @@ export class DateUtils {
     return date.tz(tz).format("dddd, MMMM D, YYYY HH:mm z")
   }
 
-  // Add a utility method to get the configured timezone
   static getConfiguredTimezone(): string {
     return DateUtils._configuredTimezone
   }

@@ -10,10 +10,6 @@ import {
   ApiUnprocessableEntityResponse,
 } from "@nestjs/swagger"
 
-// Derived from the public ApiResponse options so we avoid a deep import into
-// @nestjs/swagger/dist, which is blocked by the package's exports map under
-// nodenext module resolution. `schema` lives on the schema-host member of the
-// ApiResponseOptions union, so extract that member before indexing it.
 type ApiResponseSchema = Extract<
   NonNullable<Parameters<typeof ApiResponse>[0]>,
   { schema: unknown }

@@ -8,8 +8,12 @@ interface IEnvConfig {
   APP_TIMEZONE: string
   NODE_ENV: "development" | "dev" | "staging" | "production" | "test"
   API_DOCS_ENABLED: boolean
+  LOG_LEVEL: string
 
   DATABASE_URL: string
+  DATABASE_POOL_MAX: number
+  DATABASE_SSL: boolean
+  DATABASE_PREPARE: boolean
 
   THROTTLER_TTL: number
   THROTTLER_LIMIT: number
@@ -23,15 +27,6 @@ interface IEnvConfig {
 
 let _cachedEnv: IEnvConfig | null = null
 
-/* Reads and validates process.env once, then serves the same frozen object for
-   the life of the process. Modules call this at import time (CorsConfig,
-   swaggerConfig, LoggerUtils), so a missing or malformed variable fails at
-   boot rather than on the first request that happens to need it.
-
-   Every variable carries a default so the app boots with no .env at all --
-   useful for tests and a first `bun run dev`. Anything that must not have a
-   development default (a real secret, once auth lands) should be declared
-   without one, which makes envalid exit at boot when it is absent. */
 export function getEnv(): IEnvConfig {
   if (_cachedEnv) return _cachedEnv
 
@@ -45,14 +40,17 @@ export function getEnv(): IEnvConfig {
       choices: ["development", "dev", "staging", "production", "test"],
       default: "development",
     }),
-    /* Mounts the Scalar API reference at /docs. Defaults to false so an
-       environment that never sets it cannot expose the schema by accident;
-       .env.example enables it for local development. */
     API_DOCS_ENABLED: bool({ default: false }),
 
-    /* Placeholder for the data layer. Empty by default so the app boots with
-       no database; give it no default once a real connection is required. */
-    DATABASE_URL: str({ default: "" }),
+    LOG_LEVEL: str({
+      choices: ["fatal", "error", "warn", "info", "debug", "trace", "silent"],
+      default: "info",
+    }),
+
+    DATABASE_URL: str(),
+    DATABASE_POOL_MAX: num({ default: 10 }),
+    DATABASE_SSL: bool({ default: false }),
+    DATABASE_PREPARE: bool({ default: true }),
 
     THROTTLER_TTL: num({ default: 60 }),
     THROTTLER_LIMIT: num({ default: 60 }),
@@ -78,8 +76,12 @@ export function getEnv(): IEnvConfig {
     APP_TIMEZONE: env.APP_TIMEZONE,
     NODE_ENV: env.NODE_ENV,
     API_DOCS_ENABLED: env.API_DOCS_ENABLED,
+    LOG_LEVEL: env.LOG_LEVEL,
 
     DATABASE_URL: env.DATABASE_URL,
+    DATABASE_POOL_MAX: env.DATABASE_POOL_MAX,
+    DATABASE_SSL: env.DATABASE_SSL,
+    DATABASE_PREPARE: env.DATABASE_PREPARE,
 
     THROTTLER_TTL: env.THROTTLER_TTL,
     THROTTLER_LIMIT: env.THROTTLER_LIMIT,
