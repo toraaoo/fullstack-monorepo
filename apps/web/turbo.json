@@ -1,0 +1,15 @@
+{
+  "$schema": "https://turborepo.com/schema.json",
+  "extends": ["//"],
+  "tasks": {
+    "dev": {
+      "cache": false,
+      "persistent": true,
+      "with": ["dev:i18n"]
+    },
+    "dev:i18n": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

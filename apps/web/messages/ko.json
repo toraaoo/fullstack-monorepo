@@ -1,0 +1,54 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "app_name": "모노레포 스캐폴드",
+
+  "nav_language": "언어",
+  "nav_theme": "테마 전환",
+
+  "home_eyebrow": "Turborepo 워크스페이스",
+  "home_title": "Next.js + NestJS 모노레포",
+  "home_lede": "프런트엔드, API, 공용 컴포넌트 라이브러리, 타입이 붙은 클라이언트를 하나의 워크스페이스에 담았습니다. 아래 내용은 실행 중인 API에서 읽어옵니다.",
+  "home_cta_docs": "API 레퍼런스",
+  "home_cta_repo": "설치 안내 보기",
+
+  "status_heading": "실시간 상태 점검",
+  "status_endpoint": "GET {path}",
+  "status_refresh": "다시 확인",
+  "status_probe_api": "API 프로세스",
+  "status_probe_database": "데이터베이스",
+  "status_probe_memory": "메모리 힙",
+  "status_state_checking": "확인 중",
+  "status_state_up": "정상",
+  "status_state_down": "중단",
+  "status_state_unknown": "값 없음",
+  "status_summary_checking": "API를 확인하는 중…",
+  "status_summary_ok": "모든 의존성이 정상입니다.",
+  "status_summary_degraded": "API는 응답했지만 일부 의존성이 비정상입니다.",
+  "status_summary_unreachable": "API가 응답하지 않습니다.",
+  "status_hint_unreachable": "bun run dev로 실행하거나 NEXT_PUBLIC_API_URL을 실행 중인 주소로 지정하세요.",
+  "status_checked_at": "마지막 확인 {time}",
+
+  "stack_heading": "이미 연결된 구성",
+  "stack_role_web": "웹",
+  "stack_role_api": "API",
+  "stack_role_data": "데이터",
+  "stack_role_i18n": "번역",
+  "stack_role_state": "서버 상태",
+  "stack_role_forms": "폼과 스키마",
+  "stack_role_ui": "디자인 시스템",
+  "stack_role_tooling": "도구",
+
+  "access_heading": "액세스 요청",
+  "access_lede": "실제로 동작하는 폼입니다. TanStack Form이 상태를 관리하고 Zod가 검증하며, 문구는 이 페이지와 같은 카탈로그에서 가져옵니다.",
+  "access_email_label": "이메일 주소",
+  "access_email_placeholder": "you@company.com",
+  "access_submit": "액세스 요청",
+  "access_submitting": "보내는 중…",
+  "access_error_required": "이메일 주소를 입력하세요.",
+  "access_error_invalid": "올바른 이메일 주소가 아닙니다.",
+  "access_accepted": "{email} 검증 완료 — 전송된 내용은 없습니다.",
+  "access_notice": "아직 이 폼에 연결된 엔드포인트가 없습니다. 제출은 검증 경로만 확인합니다.",
+
+  "footer_note": "제품 이름이 정해지면 이 페이지를 교체하세요."
+}

@@ -5,20 +5,28 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "dev:i18n": "paraglide-js compile --watch",
+    "build": "bun run i18n && next build",
     "start": "next start",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "bun run i18n && tsc --noEmit",
+    "i18n": "paraglide-js compile"
   },
   "dependencies": {
+    "@phosphor-icons/react": "^2.1.10",
+    "@tanstack/react-form": "^1.33.5",
+    "@tanstack/react-query": "^5.102.8",
+    "@workspace/api-client": "workspace:*",
     "@workspace/ui": "workspace:*",
-    "lucide-react": "^1.39.0",
     "next": "16.3.4",
     "next-themes": "^0.4.6",
     "react": "19.2.8",
-    "react-dom": "19.2.8"
+    "react-dom": "19.2.8",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
+    "@inlang/paraglide-js": "^2.25.0",
     "@tailwindcss/postcss": "^4.3.3",
+    "@tanstack/react-query-devtools": "^5.102.8",
     "@types/node": "^26.4.1",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.5",

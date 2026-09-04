@@ -1,0 +1,54 @@
+{
+  "$schema": "https://inlang.com/schema/inlang-message-format",
+
+  "app_name": "Monorepo scaffold",
+
+  "nav_language": "Language",
+  "nav_theme": "Toggle theme",
+
+  "home_eyebrow": "Turborepo workspace",
+  "home_title": "Next.js + NestJS monorepo",
+  "home_lede": "A front end, an API, a shared component library, and a typed client in one workspace. Everything below reads from the running API.",
+  "home_cta_docs": "API reference",
+  "home_cta_repo": "Read the setup",
+
+  "status_heading": "Live system check",
+  "status_endpoint": "GET {path}",
+  "status_refresh": "Re-run",
+  "status_probe_api": "API process",
+  "status_probe_database": "Database",
+  "status_probe_memory": "Memory heap",
+  "status_state_checking": "Checking",
+  "status_state_up": "Up",
+  "status_state_down": "Down",
+  "status_state_unknown": "No reading",
+  "status_summary_checking": "Probing the API…",
+  "status_summary_ok": "All dependencies reporting healthy.",
+  "status_summary_degraded": "The API answered, but a dependency is unhealthy.",
+  "status_summary_unreachable": "No answer from the API.",
+  "status_hint_unreachable": "Start it with bun run dev, or point NEXT_PUBLIC_API_URL at a running instance.",
+  "status_checked_at": "Last read {time}",
+
+  "stack_heading": "What is already wired",
+  "stack_role_web": "Web",
+  "stack_role_api": "API",
+  "stack_role_data": "Data",
+  "stack_role_i18n": "Translation",
+  "stack_role_state": "Server state",
+  "stack_role_forms": "Forms and schemas",
+  "stack_role_ui": "Design system",
+  "stack_role_tooling": "Tooling",
+
+  "access_heading": "Request access",
+  "access_lede": "The form is real: TanStack Form holds the state, Zod validates it, and the messages come from the same catalogue as the rest of this page.",
+  "access_email_label": "Email address",
+  "access_email_placeholder": "you@company.com",
+  "access_submit": "Request access",
+  "access_submitting": "Sending…",
+  "access_error_required": "Enter an email address.",
+  "access_error_invalid": "That is not a valid email address.",
+  "access_accepted": "Validated {email} — but nothing was sent.",
+  "access_notice": "No endpoint is wired to this form yet. Submitting only proves the validation path.",
+
+  "footer_note": "Replace this page when the product has a name."
+}

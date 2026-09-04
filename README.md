@@ -11,7 +11,11 @@ Turborepo monorepo with a shared shadcn/ui component library.
 | Next.js      | 16.3.x  | App Router, Turbopack builds                       |
 | React        | 19.2.x  | RSC enabled                                        |
 | Tailwind CSS | 4.3.x   | CSS-first config, no `tailwind.config.js`          |
-| shadcn/ui    | CLI 4.x | `base-nova` style, Base UI primitives, lucide icons |
+| shadcn/ui    | CLI 4.x | `base-nova` style, Base UI primitives                |
+| Phosphor     | 2.1.x   | Icon set used in app code (`@phosphor-icons/react`) |
+| Paraglide JS | 2.25.x  | Compiler-based i18n for the web app                 |
+| TanStack     | Query 5 / Form 1 | Server state and forms                     |
+| Zod          | 4.5.x   | Validation, shared by the API and the web app       |
 | Biome        | 2.5.x   | Linter + formatter (replaces ESLint + Prettier)    |
 | TypeScript   | 5.9.x   | See note on TypeScript 7 below                     |
 
@@ -19,11 +23,16 @@ Turborepo monorepo with a shared shadcn/ui component library.
 
 ```
 apps/
+  api/                    NestJS + Express API
   web/                    Next.js app — components.json points shadcn at packages/ui
+    messages/             Translation catalogues, one JSON per locale
+    project.inlang/       inlang project + paraglide.config.ts
+    lib/paraglide/        Generated, git-ignored, never edited by hand
 packages/
   ui/                     Shared shadcn/ui library (@workspace/ui)
     src/components/       Components land here, added from apps/web
     src/styles/globals.css  Single source of Tailwind theme + CSS variables
+  api-client/             Typed client for apps/api (@workspace/api-client)
   typescript-config/      Shared tsconfig bases (@workspace/typescript-config)
 biome.json                Single root config — Biome runs as a Turborepo root task
 turbo.json
@@ -42,7 +51,50 @@ bun run check            # biome check .  (lint + format, read-only)
 bun run check:fix        # biome check . --write
 bun run lint             # biome lint .
 bun run format           # biome format . --write
+
+cd apps/web
+bun run i18n             # compile messages/*.json into lib/paraglide
 ```
+
+## Internationalisation (apps/web)
+
+Locales are `en` (base) and `ko`, declared in `project.inlang/settings.json`. Copy
+lives in `messages/<locale>.json`; Paraglide compiles it into typed functions under
+`lib/paraglide/`, which is generated and git-ignored.
+
+Turbopack cannot run Paraglide's webpack plugin, so compilation is a script instead.
+`dev`, `build`, and `typecheck` each run `bun run i18n` first. `turbo dev` additionally
+runs `dev:i18n` — the compiler in watch mode — alongside the dev server, via the `with`
+option in `apps/web/turbo.json`, so editing a message recompiles it immediately.
+
+Compiler options live in `project.inlang/paraglide.config.ts`, not in CLI flags.
+
+Locale resolution is cookie-first (`PARAGLIDE_LOCALE`), then `Accept-Language`, then
+the base locale. It never appears in the URL, so there is no `[locale]` route segment.
+`proxy.ts` writes the cookie on the first request, so the server and the browser read
+the locale from the same place on every request after the first byte.
+
+The locale is passed explicitly, never held in global state. Server Components resolve
+it once with `await getServerLocale()` (memoised per request with React `cache`), and
+every message call names it: `m.some_key({}, { locale })`. Client Components take
+`locale` as a prop and do the same. `getLocale()` is synchronous and Next 16 exposes
+the request only asynchronously, so there is no correct global for a Server Component
+to read — and a Client Component's server-render pass has its own module graph anyway.
+Explicit locale is the only form that is right in all three passes.
+
+Adding a locale: add it to `settings.json`, add `messages/<locale>.json`, and add a
+label to `LOCALE_LABELS` in `components/locale-switcher.tsx`.
+
+## Calling the API
+
+`@workspace/api-client` wraps `fetch` with Zod-validated responses, a typed error
+union (`network`, `timeout`, `http`, `invalid-response`), and the `x-lang` header the
+API's `nestjs-i18n` resolver reads. It also exports ready-made `queryOptions` factories
+(`healthQueries`) for TanStack Query.
+
+`apps/web/lib/api/client.ts` memoises one client per locale; `lib/query/client.ts`
+holds the SSR-correct QueryClient (fresh per request on the server, singleton in the
+browser).
 
 ## Adding shadcn components
 
@@ -77,7 +129,9 @@ import { cn } from "@workspace/ui/lib/utils"
   `packages/ui/src/styles/globals.css`. Apps import it via `@workspace/ui/globals.css`
   and share `packages/ui/postcss.config.mjs`.
 - **Both `components.json` files must agree** on `style`, `baseColor`, and
-  `iconLibrary`, or the CLI will emit mismatched components.
+  `iconLibrary`, or the CLI will emit mismatched components. `iconLibrary` is
+  `phosphor`, so generated components import from `@phosphor-icons/react` — the same
+  set app code uses. Server Components import from `@phosphor-icons/react/ssr`.
 - **Tailwind v4:** the `tailwind.config` field in `components.json` is intentionally
   empty — there is no JS config file.
 - **Biome is a root task.** Turborepo recommends this over per-package lint tasks
