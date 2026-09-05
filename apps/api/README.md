@@ -168,8 +168,8 @@ A handler that returns `successResponse(...)` itself is left alone.
 
 **`AllExceptionsFilter`** catches everything, maps the status to an `ErrorCode`, and
 resolves the message in the request language. On 5xx it attaches the request id to the
-body and logs the error against it. `API_DEBUG_ERRORS` adds the raw message and a
-stacktrace array.
+body and logs the error against it. On 5xx only, `API_DEBUG_ERRORS` also adds the
+raw message and a stacktrace array — 4xx bodies never carry one.
 
 Throw `ApiException` when you want to name the code yourself:
 

@@ -72,7 +72,7 @@ Every JSON response the API returns has one of two shapes.
 | `responseOf(schema)` | Union with `data` typed |
 
 `error.fields` is the `422` field map, `error.requestId` is set on 5xx, and
-`error.stacktrace` appears only when `API_DEBUG_ERRORS` is on.
+`error.stacktrace` appears on 5xx only, and only when `API_DEBUG_ERRORS` is on.
 
 The API builds these in `shared/response.ts`; `@workspace/client` parses them in
 `core/request.ts`. Neither hand-writes the shape.

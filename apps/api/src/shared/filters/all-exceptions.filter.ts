@@ -90,14 +90,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
         { err: exception, requestId: error.requestId },
         "Request failed"
       )
-    }
 
-    if (getEnv().API_DEBUG_ERRORS && exception instanceof Error) {
-      error.message = exception.message
-      error.stacktrace = exception.stack
-        ?.split("\n")
-        .map((line) => line.trim())
-        .filter(Boolean)
+      if (getEnv().API_DEBUG_ERRORS && exception instanceof Error) {
+        error.message = exception.message
+        error.stacktrace = exception.stack
+          ?.split("\n")
+          .map((line) => line.trim())
+          .filter(Boolean)
+      }
     }
 
     response.status(status).json(errorResponse(code, message, error))

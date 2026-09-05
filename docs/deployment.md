@@ -68,7 +68,7 @@ before `docker compose up`.
 | `NEXT_PUBLIC_API_URL` | Baked into the web bundle. Changing it needs `docker compose build web`, not a restart |
 | `API_PUBLIC_URL` | Becomes the API's `APP_URL` |
 | `API_IMAGE` `WEB_IMAGE` | Set to pull prebuilt images from a registry instead of building locally |
-| `API_DEBUG_ERRORS` | Puts the raw message and a stacktrace in error responses. Follows `NODE_ENV` when unset |
+| `API_DEBUG_ERRORS` | Puts the raw message and a stacktrace in 5xx error responses. Follows `NODE_ENV` when unset |
 
 Per-app development config still lives in `apps/api/.env` and `apps/web/.env`.
 
