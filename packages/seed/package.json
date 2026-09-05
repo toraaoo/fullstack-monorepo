@@ -1,0 +1,110 @@
+{
+  "name": "@workspace/seed",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "description": "ORM-agnostic database seeding for TypeScript fixtures",
+  "bin": {
+    "seed": "./src/cli/main.ts"
+  },
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@faker-js/faker": "^10.6.0",
+    "citty": "^0.2.2"
+  },
+  "peerDependencies": {
+    "drizzle-orm": ">=0.44",
+    "postgres": ">=3.4"
+  },
+  "peerDependenciesMeta": {
+    "drizzle-orm": {
+      "optional": true
+    },
+    "postgres": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "drizzle-orm": "^0.45.2",
+    "postgres": "^3.4.9",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "bun": "./src/index.ts",
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    },
+    "./adapter": {
+      "bun": "./src/adapter/index.ts",
+      "import": {
+        "types": "./dist/adapter/index.d.ts",
+        "default": "./dist/adapter/index.js"
+      },
+      "require": {
+        "types": "./dist/adapter/index.d.cts",
+        "default": "./dist/adapter/index.cjs"
+      }
+    },
+    "./dialect": {
+      "bun": "./src/dialect/index.ts",
+      "import": {
+        "types": "./dist/dialect/index.d.ts",
+        "default": "./dist/dialect/index.js"
+      },
+      "require": {
+        "types": "./dist/dialect/index.d.cts",
+        "default": "./dist/dialect/index.cjs"
+      }
+    },
+    "./dialect/postgres": {
+      "bun": "./src/dialect/postgres.ts",
+      "import": {
+        "types": "./dist/dialect/postgres.d.ts",
+        "default": "./dist/dialect/postgres.js"
+      },
+      "require": {
+        "types": "./dist/dialect/postgres.d.cts",
+        "default": "./dist/dialect/postgres.cjs"
+      }
+    },
+    "./drizzle": {
+      "bun": "./src/adapter/drizzle.ts",
+      "import": {
+        "types": "./dist/adapter/drizzle.d.ts",
+        "default": "./dist/adapter/drizzle.js"
+      },
+      "require": {
+        "types": "./dist/adapter/drizzle.d.cts",
+        "default": "./dist/adapter/drizzle.cjs"
+      }
+    },
+    "./postgres": {
+      "bun": "./src/adapter/postgres.ts",
+      "import": {
+        "types": "./dist/adapter/postgres.d.ts",
+        "default": "./dist/adapter/postgres.js"
+      },
+      "require": {
+        "types": "./dist/adapter/postgres.d.cts",
+        "default": "./dist/adapter/postgres.cjs"
+      }
+    }
+  }
+}
