@@ -7,11 +7,9 @@ seeder that is safe to run twice.
 - [Defining a table](#defining-a-table)
 - [Migrations](#migrations)
 - [Seeding](#seeding)
-- [Fixture format](#fixture-format)
-- [Placeholders](#placeholders)
+- [Writing a fixture](#writing-a-fixture)
 - [How re-running stays idempotent](#how-re-running-stays-idempotent)
 - [Dependencies between fixtures](#dependencies-between-fixtures)
-- [Inside the seeder](#inside-the-seeder)
 - [Scripts](#scripts)
 
 ---
@@ -36,9 +34,9 @@ apps/api/
   db/                        tooling
     migrations/              generated SQL — never edited by hand
     fixtures/                seed data
+      define.ts              binds the fixture API to the Drizzle schema
       base/                  applied in every environment
       local/                 applied by `db:seed local`
-    seeder/                  the seed runner
 ```
 
 Three decisions worth stating outright, because each is deliberate.
@@ -49,12 +47,13 @@ re-exported from `schema/index.ts`. `drizzle-kit` generates from that barrel and
 `createDatabaseClient` hands the same namespace to `drizzle()`, so the generator and the
 typed client cannot disagree about what exists.
 
-**The seeder lives in `db/`, outside `src/`.** It is build-time tooling, not part of the
+**Fixtures live in `db/`, outside `src/`.** They are build-time data, not part of the
 service. `tsconfig.build.json` compiles `src/**` only, so nothing under `db/` reaches
 `dist/` or the runtime image; `tsconfig.json` still includes it, so `bun run typecheck`
-covers it.
+covers the fixtures.
 
-**`fixtures/` is data, `seeder/` is code.** They never share a name.
+**The seed runner is not in this app at all.** It is `@workspace/seed`, a generic
+package with no knowledge of this project.
 
 `example_categories` and `example_items` exist to exercise the pipeline end to end.
 They are scaffolding: delete `example.schema.ts` and the two fixtures targeting it, then
@@ -111,50 +110,50 @@ Never use `drizzle-kit push` against anything you care about: it applies immedia
 records no history, and drops columns without asking.
 
 ---
-
 ## Seeding
 
+Fixtures are TypeScript. The seeder itself lives in `@workspace/seed` — an
+ORM-agnostic package whose full surface is documented in
+[`packages/seed/README.md`](../packages/seed/README.md). This section covers how it is
+wired up here.
+
 ```bash
-bun run db:seed                       # base only
-bun run db:seed local                 # base + local
-bun run db:seed local -n              # dry run, nothing committed
-bun run db:seed local -o example_items
-bun run db:seed -l                    # what would run, without connecting
-bun run db:seed --help
+bun run db:seed                        # base only
+bun run db:seed local                  # base + local
+bun run db:seed local --seed 42        # reproducible random values
+bun run db:seed:diff local             # what would change, then roll back
+bun run db:seed:reset local            # truncate the targeted tables, then reseed
+bun run db:seed:list local             # the fixtures and their resolved order
 ```
 
-The environment is a positional argument. `db:seed` forwards whatever you pass it, so
-there is one script and the flags do the rest.
+Two files wire the tool to this app. `seed.config.ts` builds the adapter, and
+`db/fixtures/define.ts` binds the fixture API to the Drizzle schema:
+
+```ts
+export const { defineFixture, ref } = createBuilder(drizzleTables(schema))
+```
+
+That is the only ORM-aware file under `db/fixtures/`. Every fixture imports
+`defineFixture` from it and names tables as strings, so the fixtures themselves carry
+no Drizzle import. `drizzleTables()` is erased at build time — it exists to make the
+table name a typed union and to infer each row's shape, so a wrong table or a
+misspelled column is a compile error.
 
 Fixtures are organised as **one always-applied tier plus one directory per
 environment**:
 
 ```
 db/fixtures/
-  base/           rows the application needs to work anywhere — roles, statuses, settings
+  define.ts
+  base/           rows the application needs anywhere — roles, statuses, settings
   local/          demo data for development
   test/           whatever the test suite expects
-  staging/        ...
 ```
 
-`base` is applied on every run. Environment tiers are **opt-in**: nothing but `base`
-runs unless `--env` names a directory. A missing directory is not an error — `base`
-still applies — so `db:seed $NODE_ENV` is safe to wire into a pipeline before those
-fixtures exist, though it does print a note.
-
-| Flag | Effect |
-| --- | --- |
-| `<environment>` | Positional. Also apply `db/fixtures/<environment>`. `-e, --env <name>` does the same. |
-| `-o, --only <a,b>` | Apply only fixtures matching a table, file or tier name. Errors if nothing matches. |
-| `-n, --dry-run` | Resolve and apply everything inside a transaction, then roll it back. |
-| `-f, --force` | Allow an environment that does not match `NODE_ENV`. |
-| `-l, --list` | List the fixtures that would run, then exit. Never connects to the database. |
-| `-v, --verbose` | Show which columns each fixture overwrites on conflict. |
-| `-q, --quiet` | Print the summary line only. |
-| `-d, --dir <path>` | Fixture root. Defaults to `db/fixtures`. |
-
-Naming an environment is refused when `NODE_ENV` is `staging` or `production` and the
-environment differs, unless `--force` is given. Unknown flags get a suggestion.
+`base` is applied on every run. Environment tiers are opt-in, and a missing directory
+is a note rather than an error, so `bun run db:seed $NODE_ENV` is safe to wire into a
+pipeline before those fixtures exist. Naming an environment is refused when `NODE_ENV`
+is `staging` or `production` and the environment differs, unless `--force` is given.
 
 The whole run is a single transaction. A bad fixture, an unresolvable reference or a
 constraint violation rolls back everything, so the database is never left half-seeded.
@@ -164,159 +163,86 @@ migration is a schema change that has already run everywhere, and seed data chan
 
 ---
 
-## Fixture format
+## Writing a fixture
 
-One JSON file per table, each declaring how it is applied.
+```ts
+import { env, faker, hash, now, random } from "@workspace/seed"
+import { defineFixture, ref } from "../define"
 
-```json
-{
-  "table": "example_categories",
-  "description": "Optional. For the reader, not the runner.",
-  "conflictTarget": ["slug"],
-  "update": ["name", "position"],
-  "rows": [
-    { "slug": "tools", "name": "Tools", "position": 1 }
-  ]
-}
+export default defineFixture("example_items", {
+  rows: [
+    {
+      reference: "ITEM-0001",
+      categoryId: ref("example_categories", "tools"),
+      title: "Torque wrench",
+      ownerEmail: env("SEED_OWNER_EMAIL", "demo@example.com"),
+      secret: hash("changeme"),
+      token: random(48),
+      publishedAt: now("-30d"),
+    },
+    ...Array.from({ length: 50 }, (_, index) => ({
+      reference: `ITEM-${String(index + 2).padStart(4, "0")}`,
+      categoryId: ref("example_categories", "tools"),
+      title: faker.commerce.productName(),
+      ownerEmail: "demo@example.com",
+    })),
+  ],
+})
 ```
 
-| Field | Required | Meaning |
-| --- | --- | --- |
-| `table` | yes | Postgres table name, as declared in the schema |
-| `conflictTarget` | yes | The natural key — the columns a re-run matches on |
-| `update` | no | Columns an existing row has overwritten. Default below |
-| `rows` | yes | The data. Keys are TypeScript property names, camelCase |
-| `description` | no | Ignored by the runner |
+Repetition is a loop and shared values are a `const` — the tool adds no `count` or
+`extends` of its own. Import `faker` from `@workspace/seed` rather than
+`@faker-js/faker`, or `--seed` cannot reach it.
 
-Every file is validated with Zod before anything touches the database, and the runner
-rejects unknown tables, unknown columns and rows missing a `conflictTarget` value with a
-message naming the file and row index. `conflictTarget` must be backed by a unique
-constraint, otherwise Postgres has nothing to match on.
+The upsert target is inferred from the table's unique constraints. Pass `key` when
+there is a choice, or when it is composite.
 
-Ordering within a tier comes from the filename, so fixtures are numbered
-(`001-`, `010-`).
-
----
-
-## Placeholders
-
-Any string value may carry `{{...}}` placeholders, resolved before the insert. A value
-that is exactly one directive keeps its type — `{{now:-30d}}` becomes a `Date`,
-`{{int:1..9}}` a number. Mixed into a longer string it is interpolated
-(`"batch-{{int:1000..9999}}"`). Nested objects and arrays are walked, so `jsonb` columns
-work the same way.
-
-| Placeholder | Result |
-| --- | --- |
-| `{{now}}` | Current timestamp, fixed once per run |
-| `{{now:-30d}}`, `{{now:+2h}}` | Offset from now. Units `ms s m h d w M y` |
-| `{{date:2024-01-15}}` | A fixed date |
-| `{{uuid}}` | Random v4 |
-| `{{uuid:some-key}}` | Deterministic UUID from the key — same key, same id, every run and every environment |
-| `{{random:48}}` | 48 random hex characters |
-| `{{int:1..100}}` | Random integer, inclusive |
-| `{{pick:a\|b\|c}}` | One of the options |
-| `{{env:NAME}}`, `{{env:NAME:default}}` | Environment variable; fails if unset with no default |
-| `{{hash:changeme}}` | scrypt hash, `scrypt$N$r$p$salt$key` |
-| `{{ref:table.key.column}}` | A column from a row seeded by its natural key |
-
-`{{hash}}` uses `node:crypto` scrypt (N=16384, r=8, p=1, 64-byte key, random 16-byte
-salt), so there is no dependency to install and no hash format baked in that a real auth
-module would have to match. It is a legitimate password KDF, but when authentication
-lands, the format that module chooses is the one that belongs here.
-
-Each one is a named function under `seeder/placeholders/`; adding one is a function plus
-a line in the map in `placeholders/index.ts`.
+The helper set is deliberately small: `ref`, `now`, `uuid`, `random`, `hash`, `env`,
+`sql`, `file` and `once`. Each exists because it needs something the language does not
+have — a value resolved after the database is reachable, a clock fixed for the run, or
+a marker saying a value is volatile. A fixed date is `new Date("2024-01-15")`; a random
+integer is `faker.number.int()`.
 
 ---
 
 ## How re-running stays idempotent
 
-Every fixture becomes one multi-row `INSERT ... ON CONFLICT (natural key) DO UPDATE`, so
-a second run updates instead of failing, and rows are never deleted.
+Every fixture becomes one multi-row `INSERT ... ON CONFLICT (natural key) DO UPDATE`,
+so a second run updates instead of failing, and rows are never deleted.
 
 Which columns an existing row has overwritten:
 
 - `update` listed explicitly — exactly those columns.
-- `update` omitted — every column the rows set, minus the `conflictTarget`, minus any
-  column whose value came from a **non-deterministic** placeholder (`{{hash}}`,
-  `{{random}}`, `{{uuid}}` without a key, `{{now}}`, `{{int}}`, `{{pick}}`).
+- `update` omitted — every column the rows set, minus the key, minus any column whose
+  value came from a **volatile** helper: `hash`, `random`, `uuid()` without a key,
+  `now`, and anything wrapped in `once`.
 
-That last exclusion is the point. A salted hash and a random token differ on every
-resolve, so overwriting them would rewrite every row on every run and quietly invalidate
-anything issued against them. They are written once, at insert, and left alone
-afterwards. Deterministic placeholders — `{{date}}`, `{{uuid:key}}`, `{{env}}`, `{{ref}}`
-— are stable, so they stay in the update set.
+That exclusion is the point. A salted hash and a random token differ on every resolve,
+so overwriting them would rewrite every row on every run and quietly invalidate
+anything issued against them. They are written once, at insert, and left alone after.
 
-`updatedAt` is set to `now()` whenever a row actually has something updated, and left
-alone when the fixture overwrites nothing.
-
-The consequence worth knowing: **edit a fixture, re-run, and the change lands.** That is
-what `update` is for. Listing a volatile column in `update` explicitly gives churn on
-every run, and that is your call to make.
-
-The reported `inserted` / `updated` split comes from Postgres itself (`xmax = 0` on the
-returned row), not from a guess.
+The consequence worth knowing: **edit a fixture, re-run, and the change lands.** Use
+`bun run db:seed:diff local` first to see exactly what would move.
 
 ---
 
 ## Dependencies between fixtures
 
-Foreign keys are handled in three places.
+**Order is computed, never trusted to filenames.** The runner builds a dependency graph
+from the real foreign keys *and* from the `ref()` calls in the data, then sorts it. A
+fixture referencing a table with no foreign-key constraint still lands in the right
+place, and rows within a fixture are ordered too, so a self-referencing table works
+regardless of how its rows are listed.
 
-**Order is computed, not trusted.** The runner reads the real foreign-key constraints off
-the Drizzle schema, builds a dependency graph over the fixtures in the run, and
-topologically sorts them, using filename order only as the tiebreak. A child fixture
-numbered before its parent still runs after it. A cycle is an error naming the tables
-involved.
+**Values come from `ref()`,** which addresses a row by natural key rather than by an id
+nobody can write down. The target column is inferred from the foreign key. It resolves
+from rows written earlier in the same run and falls back to a `SELECT` otherwise, so
+`--only example_items` works on its own.
 
-**Values come from `{{ref:table.key.column}}`,** which addresses a row by its natural key
-rather than by an id nobody can write down:
-
-```json
-{ "categoryId": "{{ref:example_categories.tools.id}}" }
-```
-
-It resolves from rows returned earlier in the same run, and falls back to a `SELECT` by
-that table's declared `conflictTarget` when the row was seeded on a previous run or
-filtered out by `--only`. So `--only=example_items` works on its own. For a composite
-natural key, join the values with `|`.
-
-**Atomicity is the transaction.** An unresolvable reference aborts the run and nothing is
-written.
-
----
-
-## Inside the seeder
-
-Flat, one job per file. Only the placeholder language has enough surface to earn a
-folder.
-
-```
-db/seeder/
-  cli.ts            commander: flags, guards, wiring
-  output.ts         the report and the --list table
-  types.ts          shared types, constants, the Zod envelope
-  errors.ts         SeedError, SeedDirectiveError, fail()
-  fixtures.ts       discover tiers, read and validate the JSON
-  registry.ts       what the schema says exists: tables, columns, foreign keys
-  plan.ts           validate, filter by --only, order by the foreign-key graph
-  lookup.ts         find a row by natural key — backs {{ref}}
-  runner.ts         resolve rows, upsert, one transaction
-  placeholders/
-    index.ts        the engine: matching, recursion, the name → function map
-    dates.ts        now, date
-    ids.ts          uuid, random, int, pick
-    secrets.ts      hash
-    env.ts          env
-    refs.ts         ref
-```
-
-Argument parsing, `--help`, and "did you mean --dry-run?" come from `commander` rather
-than being hand-rolled.
-
-`runSeed(db, options)` in `runner.ts` is the programmatic entry point if you want to seed
-from a script or a test instead of the CLI.
+**Cycles are broken, not rejected.** If two tables reference each other and one foreign
+key is nullable, that column is left out of the insert and filled in by an `UPDATE`
+once its target exists; `db:seed:list` shows which. If every foreign key in the cycle
+is `NOT NULL`, that is an error naming the tables.
 
 ---
 
@@ -330,7 +256,10 @@ All run from `apps/api`.
 | `db:migrate` | Apply pending migrations |
 | `db:check` | Verify migrations against the schema |
 | `db:studio` | Drizzle Studio |
-| `db:seed` | Apply the `base` fixtures; takes the flags above |
+| `db:seed` | Apply the `base` fixtures, plus a named environment tier |
+| `db:seed:diff` | Show what seeding would change, then roll back |
+| `db:seed:reset` | Truncate the targeted tables, then seed from scratch |
+| `db:seed:list` | List the fixtures and their resolved order |
 
 `compose.yaml` publishes Postgres on `127.0.0.1:5432` so these reach it from the host.
 `POSTGRES_BIND` and `POSTGRES_PORT` in the root `.env` change that; removing the `ports`
