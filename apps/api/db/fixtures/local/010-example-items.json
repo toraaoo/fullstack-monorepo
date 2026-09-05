@@ -1,0 +1,45 @@
+{
+  "table": "example_items",
+  "description": "Scaffolding. Local environment: demo data, opt in with --env=local.",
+  "conflictTarget": ["reference"],
+  "rows": [
+    {
+      "reference": "ITEM-0001",
+      "categoryId": "{{ref:example_categories.tools.id}}",
+      "title": "Torque wrench",
+      "ownerEmail": "{{env:SEED_OWNER_EMAIL:demo@example.com}}",
+      "secret": "{{hash:changeme}}",
+      "token": "{{random:48}}",
+      "publishedAt": "{{now:-30d}}",
+      "active": true,
+      "metadata": {
+        "batch": "batch-{{int:1000..9999}}",
+        "grade": "{{pick:alpha|beta|gamma}}",
+        "reviewedAt": "{{date:2024-01-15}}",
+        "tags": ["demo", "{{pick:calibrated|uncalibrated}}"]
+      }
+    },
+    {
+      "reference": "ITEM-0002",
+      "categoryId": "{{ref:example_categories.materials.id}}",
+      "title": "Copper foil",
+      "ownerEmail": "{{env:SEED_OWNER_EMAIL:demo@example.com}}",
+      "token": "{{random:48}}",
+      "publishedAt": "{{now:-2h}}",
+      "active": true,
+      "metadata": {
+        "batch": "batch-{{int:1000..9999}}",
+        "grade": "{{pick:alpha|beta}}"
+      }
+    },
+    {
+      "reference": "ITEM-0003",
+      "categoryId": "{{ref:example_categories.archived.id}}",
+      "title": "Retired fixture",
+      "ownerEmail": "{{env:SEED_OWNER_EMAIL:demo@example.com}}",
+      "publishedAt": "{{now:-1y}}",
+      "active": false,
+      "metadata": null
+    }
+  ]
+}
