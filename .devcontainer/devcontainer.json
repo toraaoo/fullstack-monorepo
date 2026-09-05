@@ -1,0 +1,45 @@
+{
+	"name": "workspace",
+	"dockerComposeFile": "compose.yaml",
+	"service": "app",
+	"workspaceFolder": "/workspace",
+	"remoteUser": "node",
+	"features": {
+		"ghcr.io/devcontainers-extra/features/bun:1": {
+			"version": "1.4.0"
+		},
+		"ghcr.io/devcontainers/features/github-cli:1": {},
+		"ghcr.io/devcontainers/features/docker-outside-of-docker:1": {
+			"moby": false,
+			"installDockerComposeSwitch": false
+		}
+	},
+	"forwardPorts": ["3000", "8000", "db:5432"],
+	"portsAttributes": {
+		"3000": {
+			"label": "web",
+			"onAutoForward": "notify"
+		},
+		"8000": {
+			"label": "api",
+			"onAutoForward": "notify"
+		},
+		"db:5432": {
+			"label": "postgres",
+			"onAutoForward": "silent"
+		}
+	},
+	"postCreateCommand": "bash .devcontainer/post-create.sh",
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				"biomejs.biome",
+				"bradlc.vscode-tailwindcss",
+				"ms-azuretools.vscode-containers"
+			],
+			"settings": {
+				"terminal.integrated.defaultProfile.linux": "bash"
+			}
+		}
+	}
+}
