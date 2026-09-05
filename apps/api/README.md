@@ -49,7 +49,7 @@ src/
 
   core/            imported once at boot; app-wide singletons
     config/        getEnv() (envalid), CORS, helmet, Swagger
-    database/      drizzle + postgres.js, and only the connection
+    database/      drizzle + postgres.js: the connection and schema/
     i18n/          nestjs-i18n + the lang catalogues
     logger/        nestjs-pino, redaction, request-id correlation
     request-context/  nestjs-cls, the x-request-id header
@@ -113,10 +113,11 @@ bun run typecheck
 | `dev` | `nest start --watch` |
 | `build` | `nest build`, then `tsc-alias` over `tsconfig.build.json` → `dist/` |
 | `start:prod` | `node dist/main` |
-| `db:generate` | Diff the schema into a migration under `drizzle/` |
+| `db:generate` | Diff the schema into a migration under `db/migrations/` |
 | `db:migrate` | Apply pending migrations |
 | `db:check` | Verify migrations against the schema |
 | `db:studio` | Drizzle Studio |
+| `db:seed` | Apply JSON fixtures: `bun run db:seed local`. `--help` for flags |
 
 Lint and format are Biome, run from the repo root: `bun run check:fix`.
 
@@ -268,8 +269,16 @@ change touches one directory.
 
 ## Database
 
-`src/core/database` holds the connection and nothing else: a `postgres.js` pool wrapped
-in Drizzle, provided under the `DRIZZLE` symbol, closed on shutdown.
+`src/core/database` holds the connection and the schema:
+
+```
+src/core/database/
+  client.ts            createDatabaseClient() — pool, casing, shared types
+  database.module.ts   the Nest provider under the DRIZZLE symbol
+  schema/
+    index.ts           barrel — what drizzle-kit and the typed client both read
+    columns.ts         shared column builders (primaryId, timestamps)
+```
 
 ```ts
 @Module({ imports: [DatabaseModule] })
@@ -281,15 +290,25 @@ export class UsersRepository {
 }
 ```
 
-Casing is `snake_case` in both the runtime config and `drizzle.config.ts`, so TypeScript
-stays camelCase and the database stays snake_case without per-column mapping. With
-`LOG_LEVEL=debug`, every statement is logged.
+Unlike controllers and services, **tables do not live next to their feature.** The whole
+data model is one directory, split one file per area and re-exported from
+`schema/index.ts`. `drizzle-kit` generates from that barrel and `createDatabaseClient`
+hands the same namespace to `drizzle()`, so the generator and the runtime client cannot
+disagree about what exists.
 
+Casing is `snake_case` in both, so TypeScript stays camelCase and Postgres stays
+snake_case without per-column mapping. With `LOG_LEVEL=debug`, every statement is logged.
 `DatabaseHealth` probes the connection for `GET /health`.
 
-> [!NOTE]
-> `database.schema.ts` is still empty and there is no `drizzle/` directory yet. Table
-> definitions belong next to their feature (`users.schema.ts`), re-exported from
-> `database.schema.ts` so `drizzle-kit` and the typed `db` client both see them.
-> Migrations are not part of the runtime image — see
-> [deployment](../../docs/deployment.md#gotchas).
+Everything else about the database is tooling and lives in `db/`, outside `src/`, so
+`nest build` never compiles it into the runtime image:
+
+```
+db/
+  migrations/    generated SQL
+  fixtures/      seed data — base/ plus one directory per environment
+  seeder/        the seed runner
+```
+
+Migrations, the JSON seeder and its directive language are documented in
+[database](../../docs/database.md).

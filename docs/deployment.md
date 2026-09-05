@@ -136,9 +136,17 @@ container ID, which Next tries to bind and fails.
 `/var/lib/postgresql`, not `/var/lib/postgresql/data`. The old path leaves the container
 unhealthy at startup.
 
-**Migrations are not wired up yet.** `database.schema.ts` is empty and there is no
-`drizzle/` directory. When the schema lands, add a migration step before the API starts
-— `drizzle-kit` is a devDependency and is not in the runtime image.
+**Migrations are not applied by the image.** `drizzle-kit` is a devDependency, so
+`bun run db:migrate` is a development and CI command — neither the API container nor
+`compose.yaml` runs it at startup. Apply pending migrations from your deploy pipeline,
+against the target database, before rolling the new image. Seeding is the same:
+`bun run db:seed` applies the `base` fixtures and is safe to re-run anywhere, and
+environment fixtures are opt-in: `bun run db:seed <environment>`. See
+[database](database.md#migrations).
+
+**Postgres is published on the loopback interface** in `compose.yaml`, so `drizzle-kit`
+and the seeder can reach it from the host. `POSTGRES_BIND` and `POSTGRES_PORT` change
+that; drop the `ports` entry to keep the database on the compose network alone.
 
 **`turbo prune` respects `.gitignore`** (since turbo 2.3.4), and inlang generates a
 `project.inlang/.gitignore` that ignores everything but `settings.json`. That is

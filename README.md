@@ -161,6 +161,7 @@ Database commands live in `apps/api` — see [its README](apps/api/README.md#dat
 | Document | Covers |
 | --- | --- |
 | [Architecture](docs/architecture.md) | Request flow, response envelope, the API client, conventions |
+| [Database](docs/database.md) | Drizzle schema layout, migrations, the JSON seeder |
 | [Deployment](docs/deployment.md) | Images, environment variables, health checks, gotchas |
 | [Internationalisation](docs/i18n.md) | Paraglide on the web, `nestjs-i18n` on the API, shared message keys |
 | [`apps/web`](apps/web/README.md) | Routing, data fetching, locale, theme and styling |
