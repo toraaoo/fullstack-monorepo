@@ -15,7 +15,8 @@
       "!**/.turbo",
       "!**/dist",
       "!**/lib/paraglide",
-      "!**/project.inlang/cache"
+      "!**/project.inlang/cache",
+      "!apps/api/db/migrations"
     ]
   },
   "formatter": {

@@ -1,8 +1,6 @@
 {
   "extends": "@workspace/typescript-config/nestjs.json",
   "compilerOptions": {
-    "rootDir": "./src",
-    "outDir": "./dist",
     "types": ["node"],
     "paths": {
       "@core": ["./src/core"],
@@ -12,6 +10,6 @@
       "@shared/*": ["./src/shared/*"]
     }
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "db/**/*", "drizzle.config.ts"],
   "exclude": ["node_modules", "dist", "coverage"]
 }
