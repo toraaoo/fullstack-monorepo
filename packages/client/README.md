@@ -26,7 +26,10 @@ const report = await client.health.check()
 ```
 
 `locale` becomes the `x-lang` header on every request, which is what the API's
-`nestjs-i18n` resolver reads — so error messages come back translated.
+`nestjs-i18n` resolver reads — so error messages come back translated. The API also
+accepts `?lang=` / `?locale=` and `Accept-Language`, but the header is the client's
+transport; the query parameter is a manual override and outranks it — see
+[i18n](../../docs/i18n.md#api--nestjs-i18n).
 
 `client.with({ timeout: 2000 })` returns a new client with the same options and the
 overrides applied.

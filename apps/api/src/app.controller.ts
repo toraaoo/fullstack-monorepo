@@ -24,7 +24,7 @@ export class AppController {
   })
   getHello() {
     return successResponse(
-      this.i18n.t("message.app.welcome", {
+      this.i18n.t("app.welcome", {
         args: { appName: getEnv().APP_NAME },
       }),
       {

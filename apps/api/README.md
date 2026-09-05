@@ -6,6 +6,7 @@ NestJS 12 on the Express platform, with Drizzle, Pino and zod.
 - [Scripts](#scripts)
 - [Configuration](#configuration)
 - [Request pipeline](#request-pipeline)
+- [Language](#language)
 - [Validation](#validation)
 - [Feature modules](#feature-modules)
 - [Database](#database)
@@ -161,7 +162,7 @@ flowchart TD
 
 | Decorator | Effect |
 | --- | --- |
-| `@ResponseMessage("message.some.key")` | Use that catalogue key instead of `message.common.success` |
+| `@ResponseMessage("some.key")` | Use that catalogue key instead of `common.success` |
 | `@RawResponse()` | Skip the envelope entirely — used by `HealthController`, whose Terminus body orchestrators already understand |
 
 A handler that returns `successResponse(...)` itself is left alone.
@@ -179,6 +180,41 @@ throw new ApiException(409, {
   messageKey: "message.users.email_taken",
 })
 ```
+
+---
+
+## Language
+
+Every envelope message — success, error and field error alike — is resolved in the
+request language. Locales are `en` (fallback) and `ko`; catalogues live in
+`src/core/i18n/lang/<locale>/`.
+
+The language is resolved from four sources, first match wins:
+
+| Order | Source | Example |
+| --- | --- | --- |
+| 1 | `?lang=` or `?locale=` query parameter | `GET /?lang=ko` |
+| 2 | `x-lang` or `x-custom-lang` header | `x-lang: ko` |
+| 3 | `Accept-Language` | `Accept-Language: ko-KR,ko;q=0.9` |
+| 4 | fallback | `en` |
+
+**Clients should send the header.** `@workspace/client` sets `x-lang` from its `locale`
+option on every request, and both i18n headers are in the CORS allow-list, so a browser
+can send them cross-origin.
+
+The query parameter is the escape hatch: it wins over the header, and it works where a
+header cannot be set — a link, a browser address bar, a Scalar "try it" call. Use it to
+check a translation, not as the transport for a real client.
+
+```bash
+curl -H "x-lang: ko" http://localhost:8000/      # what a client does
+curl "http://localhost:8000/?lang=ko"            # what you do by hand
+```
+
+A region tag falls back to its base locale (`ko-KR` → `ko`, `en-GB` → `en`), and an
+unknown language falls through to `en` rather than erroring. The accepted names live in
+`src/core/i18n/i18n.constants.ts` — add to them there and CORS picks the headers up
+automatically.
 
 ---
 

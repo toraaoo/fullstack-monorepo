@@ -15,6 +15,7 @@ import { I18N_HEADERS, I18N_QUERY_PARAMS } from "./i18n.constants"
       fallbackLanguage: "en",
       fallbacks: {
         "en-*": "en",
+        "ko-*": "ko",
       },
       loaderOptions: {
         path: join(__dirname, "lang"),

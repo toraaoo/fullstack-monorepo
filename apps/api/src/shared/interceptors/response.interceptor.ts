@@ -14,7 +14,7 @@ import {
 } from "../decorators/response.decorator"
 import { isApiResponse, successResponse } from "../response"
 
-const DEFAULT_MESSAGE_KEY = "message.common.success"
+const DEFAULT_MESSAGE_KEY = "common.success"
 
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

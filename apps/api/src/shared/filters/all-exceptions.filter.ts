@@ -19,15 +19,15 @@ import { isRawResponse } from "../decorators/response.decorator"
 import { errorResponse } from "../response"
 
 const MESSAGE_KEYS: Record<ErrorCode, string> = {
-  BAD_REQUEST: "message.common.bad_request",
-  VALIDATION_FAILED: "message.common.unprocessable_entity",
-  UNAUTHORIZED: "message.common.unauthorized",
-  FORBIDDEN: "message.common.forbidden",
-  NOT_FOUND: "message.common.not_found",
-  CONFLICT: "message.common.conflict",
-  TOO_MANY_REQUESTS: "message.common.too_many_requests",
-  INTERNAL_ERROR: "message.common.internal_error",
-  SERVICE_UNAVAILABLE: "message.common.service_unavailable",
+  BAD_REQUEST: "common.bad_request",
+  VALIDATION_FAILED: "common.unprocessable_entity",
+  UNAUTHORIZED: "common.unauthorized",
+  FORBIDDEN: "common.forbidden",
+  NOT_FOUND: "common.not_found",
+  CONFLICT: "common.conflict",
+  TOO_MANY_REQUESTS: "common.too_many_requests",
+  INTERNAL_ERROR: "common.internal_error",
+  SERVICE_UNAVAILABLE: "common.service_unavailable",
 }
 
 const FALLBACK_MESSAGES: Record<ErrorCode, string> = {

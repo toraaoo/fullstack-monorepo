@@ -1,0 +1,26 @@
+{
+  "required": "{property} 항목은 필수입니다.",
+  "invalid_type": "{property} 항목은 {expected} 타입이어야 합니다.",
+  "invalid_value": "{property} 항목의 값이 올바르지 않습니다.",
+  "too_small": "{property} 항목의 값이 너무 작습니다.",
+  "too_big": "{property} 항목의 값이 너무 큽니다.",
+  "not_multiple_of": "{property} 항목은 {divisor}의 배수여야 합니다.",
+  "unrecognized_keys": "요청 본문에 허용되지 않은 항목이 있습니다.",
+  "invalid_union": "{property} 항목의 값이 올바르지 않습니다.",
+  "invalid_key": "{property} 항목의 키가 올바르지 않습니다.",
+  "invalid_element": "{property} 항목의 요소가 올바르지 않습니다.",
+  "custom": "{property} 항목이 올바르지 않습니다.",
+  "access": {
+    "email": {
+      "required": "이메일 주소를 입력하세요.",
+      "invalid": "올바른 이메일 주소가 아닙니다."
+    }
+  },
+  "format": {
+    "email": "{property} 항목은 올바른 이메일 주소여야 합니다.",
+    "url": "{property} 항목은 올바른 URL이어야 합니다.",
+    "uuid": "{property} 항목은 올바른 UUID여야 합니다.",
+    "datetime": "{property} 항목은 올바른 날짜와 시간이어야 합니다.",
+    "regex": "{property} 항목의 형식이 올바르지 않습니다."
+  }
+}
