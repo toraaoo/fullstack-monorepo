@@ -9,6 +9,8 @@ services:
       POSTGRES_DB: ${POSTGRES_DB:-workspace}
     volumes:
       - db-data:/var/lib/postgresql
+    ports:
+      - "${POSTGRES_BIND:-127.0.0.1}:${POSTGRES_PORT:-5432}:5432"
     healthcheck:
       test:
         - CMD-SHELL
