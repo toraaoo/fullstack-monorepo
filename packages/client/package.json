@@ -23,7 +23,7 @@
     "@tanstack/react-query": "^5.102.8",
     "@types/node": "^26.4.1",
     "@workspace/typescript-config": "workspace:*",
-    "typescript": "^5.9.3"
+    "typescript": "^6.0.3"
   },
   "exports": {
     ".": "./src/index.ts",
