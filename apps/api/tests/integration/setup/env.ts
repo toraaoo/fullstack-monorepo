@@ -1,0 +1,17 @@
+import "reflect-metadata"
+import { inject } from "vitest"
+
+process.env.NODE_ENV = "test"
+process.env.APP_NAME = "API"
+process.env.APP_VERSION = "1.0.0"
+process.env.APP_TIMEZONE = "UTC"
+process.env.API_DOCS_ENABLED = "false"
+process.env.API_DEBUG_ERRORS = "false"
+process.env.LOG_LEVEL = "silent"
+process.env.DATABASE_URL = inject("databaseUrl")
+process.env.DATABASE_POOL_MAX = "5"
+process.env.ALLOWED_ORIGINS = "http://localhost:3000"
+process.env.ALLOWED_METHODS = "GET,POST,PUT,PATCH,DELETE,OPTIONS"
+process.env.ALLOWED_HEADERS = "Content-Type,Authorization"
+process.env.THROTTLER_TTL = "60"
+process.env.THROTTLER_LIMIT = "1000"

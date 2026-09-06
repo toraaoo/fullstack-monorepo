@@ -319,14 +319,43 @@ Migrations, the JSON seeder and its directive language are documented in
 ## Testing
 
 ```bash
-bun run test
+bun run test              # unit — no Docker
 bun run test:watch
 bun run test:coverage
+bun run test:integration  # needs Docker
 ```
 
 Unit tests live in `tests/unit/`, mirroring `src/`. `tests/support/` holds the test
 doubles and `tests/setup/unit.ts` fixes the environment every suite reads, so
 `getEnv()` and `DateUtils` are deterministic.
+
+Integration tests live in `tests/integration/` and drive the assembled app over real
+HTTP against a throwaway Postgres 18 container. `setup/container.ts` is the global
+setup: it starts the container, applies `db/migrations` with the Drizzle migrator, and
+hands the connection string to each worker through `project.provide`. `setup/env.ts`
+then writes it into `process.env` before any application module loads — `getEnv()`
+reads the environment once at import and caches, so the order matters.
+
+`support/app.ts` boots the app the way `main.ts` does — the global validation pipe,
+CORS and helmet — and returns a supertest agent. It builds two apps: the real
+`AppModule`, and a fixture app that pairs `CoreModule` with a controller defined in
+`support/fixtures.controller.ts`. The fixture routes exist because the running API has
+no endpoint that takes a body or fails on purpose, and the pipeline's interesting
+behaviour — a 422 field map, a 500 with a request id, `@RawResponse`, `@ResponseMessage`
+— cannot be reached without one.
+
+What is covered: the response envelope, the error envelope and its status-to-code map,
+validation in both body and query, all three language resolvers with their regional
+fallbacks, request-id correlation from header to log to error body, rate limiting, and
+the security headers. `THROTTLER_LIMIT` is raised in `setup/env.ts` so ordinary suites
+never trip it; `throttler.test.ts` lowers it and imports the app dynamically, since the
+module reads the value once at import.
+
+There are no tests for `example_categories` and `example_items`. Those tables are
+scaffolding, and exercising them would mostly assert that Drizzle and Postgres work.
+`health.test.ts` already proves the real thing: the app resolves `DRIZZLE`, connects,
+and the indicator reports up. Write database tests when there are tables this service
+actually owns.
 
 **The config is `vitest.config.mts`, not `.ts`.** Two reasons, both forced:
 
