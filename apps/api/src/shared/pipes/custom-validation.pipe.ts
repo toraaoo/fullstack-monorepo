@@ -81,7 +81,8 @@ function issueKey(issue: $ZodIssue): string {
 }
 
 function issueArgs(issue: $ZodIssue): Record<string, unknown> {
-  const property = issue.path.length > 0 ? String(issue.path.at(-1)) : "value"
+  const path = issue.path ?? []
+  const property = path.length > 0 ? String(path.at(-1)) : "value"
 
-  return { ...issue, property, path: issue.path.join(".") }
+  return { ...issue, property, path: path.join(".") }
 }
