@@ -341,10 +341,49 @@ src/
   adapter/        index.ts (the interface) + drizzle.ts, postgres.ts
   dialect/        index.ts (the interface) + postgres.ts
   cli/            main.ts  options.ts  commands/  render/
+
+tests/
+  unit/           mirrors src/, no database
+  integration/    real Postgres via Testcontainers
+    fixtures/       fixture trees the tests actually load
+    setup/          container, schema, per-test database
+  support/        builders and fakes for the unit tests
 ```
 
 Each extension point is one directory whose `index.ts` defines what it is, with the
 implementations beside it.
+
+Internal imports go through `#src/*`, a Node [subpath
+import](https://nodejs.org/api/packages.html#subpath-imports) declared in
+`package.json`. The runtime resolves it, so TypeScript, tsup, Bun and Vitest all
+honour it with no per-tool alias configuration. Inside `tests/` the imports between
+test files stay relative.
+
+---
+
+## Testing
+
+```bash
+bun run test              unit tests, no database
+bun run test:integration  against a throwaway Postgres 18 container
+bun run test:coverage     unit tests with a v8 coverage report
+bun run test:watch        unit tests, watch mode
+```
+
+**Unit tests** mirror `src/` and never touch a database. The engine is driven through
+a recording executor that captures the SQL it would have run, so assertions are about
+generated statements, resolved plans and error messages.
+
+**Integration tests** start one `postgres:18-alpine` container per run through
+Testcontainers, and give each test file its own schema inside it. They cover both
+shipped adapters — the Drizzle one against the schema object, the introspecting one
+against the live catalogue — and assert the two agree. Docker must be available; the
+container is started in `globalSetup` and its URL reaches the tests through Vitest's
+`provide`/`inject`.
+
+Verification reads use a connection of their own. `drizzle-orm/postgres-js` replaces
+the date parsers on any client handed to it, so a shared client would hand raw strings
+back to assertions.
 
 ---
 
@@ -362,3 +401,8 @@ insert.
 
 **Programmatic use.** `seed(config, options)` and `planSeed(config, options)` are
 exported for scripts and tests.
+
+**`sql()` is deterministic, not stable.** Its *expression* never changes, so it is not
+treated as volatile and stays in the overwrite set — `sql("NOW()")` is therefore
+re-evaluated by the database on every run. Wrap it in `once()` to write it only at
+insert.

@@ -137,6 +137,8 @@ compose.yaml                db + api + web
 | TanStack | Query 5 / Form 1 | Server state and forms |
 | Zod | 4.5.x | Shared contracts across API and web |
 | Biome | 2.5.x | Lint + format, replaces ESLint + Prettier |
+| Vitest | 5.0.x | Test runner, one project per package |
+| Testcontainers | 12.1.x | Throwaway Postgres for integration tests |
 | PostgreSQL | 18 | Via Drizzle ORM |
 
 ---
@@ -148,11 +150,48 @@ compose.yaml                db + api + web
 | `bun run dev` | All apps, watch mode |
 | `bun run build` | Build everything |
 | `bun run typecheck` | `tsc --noEmit` per package |
+| `bun run test` | Unit tests per package (Vitest) |
+| `bun run test:integration` | Integration tests — needs Docker |
+| `bun run test:coverage` | Unit tests with a v8 coverage report |
+| `bun run test:watch` | Vitest watch mode across the workspace |
 | `bun run check` | Biome lint + format, read-only |
 | `bun run check:fix` | Biome, write |
 | `bun run ui:add <name>` | Add a shadcn component into `packages/ui` |
 
 Database commands live in `apps/api` — see [its README](apps/api/README.md#database).
+
+---
+
+## Testing
+
+[Vitest](https://vitest.dev) runs as one project per package. The root
+`vitest.config.ts` discovers them by glob, so `vitest` at the root runs everything and
+Turborepo caches each package's suite independently.
+
+To add tests to a package, give it a `vitest.config.ts` with a unique `name` and a
+`test` script — the root config and `turbo test` pick it up with no further wiring:
+
+```ts
+// packages/<name>/vitest.config.ts
+import { defineConfig } from "vitest/config"
+
+export default defineConfig({
+  test: {
+    name: "<name>",
+    root: import.meta.dirname,
+    environment: "node",
+    include: ["tests/unit/**/*.test.ts"],
+  },
+})
+```
+
+Suites that need a database add a second `vitest.integration.config.ts` and a
+`test:integration` script. `@workspace/seed` is the worked example: unit tests drive
+the engine through a recording executor, integration tests run against a throwaway
+Postgres 18 container started by Testcontainers. See
+[its README](packages/seed/README.md#testing).
+
+`bun run test` never needs Docker. `bun run test:integration` does.
 
 ---
 
