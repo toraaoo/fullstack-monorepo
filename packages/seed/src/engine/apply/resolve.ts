@@ -1,9 +1,9 @@
 import { createHash, randomBytes, scryptSync } from "node:crypto"
 import { readFile } from "node:fs/promises"
 import { isAbsolute, join } from "node:path"
-import { type Descriptor, isDescriptor } from "../../authoring/types.js"
-import { raw, type SeedRow } from "../../dialect/index.js"
-import { fail } from "../../errors.js"
+import { type Descriptor, isDescriptor } from "#src/authoring/types"
+import { raw, type SeedRow } from "#src/dialect/index"
+import { fail } from "#src/errors"
 
 const UUID_NAMESPACE = "0f9c4a2e-8a5d-4b53-9a6f-2f9b1c7d4e10"
 

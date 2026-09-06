@@ -1,16 +1,16 @@
-import type { SeedExecutor } from "../../adapter/index.js"
-import { fixtureLabel, type LoadedFixture } from "../../authoring/types.js"
-import type { Dialect, SeedRow } from "../../dialect/index.js"
-import { fail } from "../../errors.js"
-import type { SeedPlan } from "../plan/build.js"
-import type { Catalog } from "../plan/catalog.js"
-import { KEY_SEPARATOR } from "../plan/graph.js"
+import type { SeedExecutor } from "#src/adapter/index"
+import { fixtureLabel, type LoadedFixture } from "#src/authoring/types"
+import type { Dialect, SeedRow } from "#src/dialect/index"
 import {
   createRandomSource,
   type RefRequest,
   type ResolveContext,
   resolveRow,
-} from "./resolve.js"
+} from "#src/engine/apply/resolve"
+import type { SeedPlan } from "#src/engine/plan/build"
+import type { Catalog } from "#src/engine/plan/catalog"
+import { KEY_SEPARATOR } from "#src/engine/plan/graph"
+import { fail } from "#src/errors"
 
 export interface ColumnChange {
   column: string

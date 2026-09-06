@@ -1,12 +1,12 @@
-import { seedFaker } from "../authoring/faker.js"
-import type { LoadedFixture } from "../authoring/types.js"
-import type { ResolvedConfig } from "../config.js"
-import { resetTables } from "./apply/reset.js"
-import { applyPlan, type FixtureResult } from "./apply/upsert.js"
-import { loadFixtures } from "./load/fixtures.js"
-import { discoverTiers, resolveTiers } from "./load/tiers.js"
-import { buildPlan, type SeedPlan } from "./plan/build.js"
-import { Catalog } from "./plan/catalog.js"
+import { seedFaker } from "#src/authoring/faker"
+import type { LoadedFixture } from "#src/authoring/types"
+import type { ResolvedConfig } from "#src/config"
+import { resetTables } from "#src/engine/apply/reset"
+import { applyPlan, type FixtureResult } from "#src/engine/apply/upsert"
+import { loadFixtures } from "#src/engine/load/fixtures"
+import { discoverTiers, resolveTiers } from "#src/engine/load/tiers"
+import { buildPlan, type SeedPlan } from "#src/engine/plan/build"
+import { Catalog } from "#src/engine/plan/catalog"
 
 class Rollback extends Error {}
 

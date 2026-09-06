@@ -1,6 +1,6 @@
-import { loadConfig, type ResolvedConfig } from "../config.js"
-import type { SeedOptions } from "../engine/index.js"
-import { fail } from "../errors.js"
+import { loadConfig, type ResolvedConfig } from "#src/config"
+import type { SeedOptions } from "#src/engine/index"
+import { fail } from "#src/errors"
 
 export const commonArgs = {
   environment: {

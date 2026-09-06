@@ -1,5 +1,5 @@
-import { fail } from "../errors.js"
-import { type Descriptor, descriptor } from "./types.js"
+import { type Descriptor, descriptor } from "#src/authoring/types"
+import { fail } from "#src/errors"
 
 const MAX_RANDOM_LENGTH = 512
 

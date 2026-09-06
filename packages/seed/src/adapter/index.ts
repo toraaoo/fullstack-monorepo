@@ -1,4 +1,4 @@
-import type { Dialect, Query } from "../dialect/index.js"
+import type { Dialect, Query } from "#src/dialect/index"
 
 export interface ColumnMetadata {
   name: string
@@ -48,4 +48,4 @@ export type {
   Query,
   RenderedQuery,
   SeedRow,
-} from "../dialect/index.js"
+} from "#src/dialect/index"

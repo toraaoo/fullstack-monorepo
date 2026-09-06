@@ -6,7 +6,7 @@ import {
   type TruncateRequest,
   type UpdateRequest,
   type UpsertRequest,
-} from "./index.js"
+} from "#src/dialect/index"
 
 const INSERTED_COLUMN = "__seed_inserted"
 

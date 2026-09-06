@@ -1,13 +1,13 @@
-import type { TableMetadata } from "../../adapter/index.js"
+import type { TableMetadata } from "#src/adapter/index"
 import {
   fixtureLabel,
   isDeterministic,
   type LoadedFixture,
-} from "../../authoring/types.js"
-import type { SeedRow } from "../../dialect/index.js"
-import { locate } from "../../errors.js"
-import type { Catalog } from "./catalog.js"
-import { descriptorsIn, orderFixtures, orderRows } from "./graph.js"
+} from "#src/authoring/types"
+import type { SeedRow } from "#src/dialect/index"
+import type { Catalog } from "#src/engine/plan/catalog"
+import { descriptorsIn, orderFixtures, orderRows } from "#src/engine/plan/graph"
+import { locate } from "#src/errors"
 
 export interface PlanStep {
   fixture: LoadedFixture

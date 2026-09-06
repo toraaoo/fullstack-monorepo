@@ -3,7 +3,7 @@ import {
   descriptor,
   type Fixture,
   type FixtureSpec,
-} from "./types.js"
+} from "#src/authoring/types"
 
 export type TableTypeMap = Record<string, Record<string, unknown>>
 

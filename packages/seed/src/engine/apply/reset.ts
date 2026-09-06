@@ -1,6 +1,6 @@
-import type { SeedExecutor, TableMetadata } from "../../adapter/index.js"
-import type { Dialect } from "../../dialect/index.js"
-import type { SeedPlan } from "../plan/build.js"
+import type { SeedExecutor, TableMetadata } from "#src/adapter/index"
+import type { Dialect } from "#src/dialect/index"
+import type { SeedPlan } from "#src/engine/plan/build"
 
 export async function resetTables(
   executor: SeedExecutor,

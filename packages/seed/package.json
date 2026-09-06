@@ -2,6 +2,9 @@
   "name": "@workspace/seed",
   "version": "0.0.0",
   "type": "module",
+  "imports": {
+    "#src/*": "./src/*.js"
+  },
   "private": true,
   "license": "MIT",
   "description": "ORM-agnostic database seeding for TypeScript fixtures",

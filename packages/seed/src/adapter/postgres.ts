@@ -1,7 +1,4 @@
 import postgres, { type Sql } from "postgres"
-import type { Query } from "../dialect/index.js"
-import { postgresDialect } from "../dialect/postgres.js"
-import { fail } from "../errors.js"
 import {
   type AdapterRow,
   type DatabaseMetadata,
@@ -9,7 +6,10 @@ import {
   type SeedAdapter,
   type SeedExecutor,
   type TableMetadata,
-} from "./index.js"
+} from "#src/adapter/index"
+import type { Query } from "#src/dialect/index"
+import { postgresDialect } from "#src/dialect/postgres"
+import { fail } from "#src/errors"
 
 export interface PostgresAdapterOptions {
   url?: string

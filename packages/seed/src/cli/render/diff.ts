@@ -1,5 +1,5 @@
-import { fixtureLabel } from "../../authoring/types.js"
-import type { SeedResult } from "../../engine/index.js"
+import { fixtureLabel } from "#src/authoring/types"
+import type { SeedResult } from "#src/engine/index"
 
 function preview(value: unknown): string {
   if (value === null || value === undefined) return "null"

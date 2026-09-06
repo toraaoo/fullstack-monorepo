@@ -5,9 +5,9 @@ import {
   isDescriptor,
   type LoadedFixture,
   type RefBody,
-} from "../../authoring/types.js"
-import { fail } from "../../errors.js"
-import type { Catalog } from "./catalog.js"
+} from "#src/authoring/types"
+import type { Catalog } from "#src/engine/plan/catalog"
+import { fail } from "#src/errors"
 
 export const KEY_SEPARATOR = "|"
 

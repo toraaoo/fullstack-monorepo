@@ -1,10 +1,10 @@
 #!/usr/bin/env bun
 import { defineCommand, runMain } from "citty"
-import { SeedError } from "../errors.js"
-import diff from "./commands/diff.js"
-import list from "./commands/list.js"
-import reset from "./commands/reset.js"
-import run from "./commands/run.js"
+import diff from "#src/cli/commands/diff"
+import list from "#src/cli/commands/list"
+import reset from "#src/cli/commands/reset"
+import run from "#src/cli/commands/run"
+import { SeedError } from "#src/errors"
 
 const main = defineCommand({
   meta: {

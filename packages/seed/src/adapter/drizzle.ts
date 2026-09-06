@@ -8,8 +8,6 @@ import {
 } from "drizzle-orm"
 import { CasingCache } from "drizzle-orm/casing"
 import { getTableConfig, type PgColumn, PgTable } from "drizzle-orm/pg-core"
-import type { Query } from "../dialect/index.js"
-import { postgresDialect } from "../dialect/postgres.js"
 import {
   type AdapterRow,
   type ColumnMetadata,
@@ -18,7 +16,9 @@ import {
   type SeedAdapter,
   type SeedExecutor,
   type TableMetadata,
-} from "./index.js"
+} from "#src/adapter/index"
+import type { Query } from "#src/dialect/index"
+import { postgresDialect } from "#src/dialect/postgres"
 
 export type DrizzleCasing = "snake_case" | "camelCase"
 

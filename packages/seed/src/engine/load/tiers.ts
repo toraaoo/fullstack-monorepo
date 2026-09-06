@@ -1,5 +1,5 @@
 import { readdir } from "node:fs/promises"
-import { fail } from "../../errors.js"
+import { fail } from "#src/errors"
 
 export const BASE_TIER = "base"
 

@@ -1,13 +1,13 @@
 import { defineCommand } from "citty"
-import { planSeed } from "../../engine/index.js"
 import {
   type CommonArgs,
   commonArgs,
   toSeedOptions,
   warnMissingTiers,
   withConfig,
-} from "../options.js"
-import { formatList } from "../render/list.js"
+} from "#src/cli/options"
+import { formatList } from "#src/cli/render/list"
+import { planSeed } from "#src/engine/index"
 
 export default defineCommand({
   meta: {

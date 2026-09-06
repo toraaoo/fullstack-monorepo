@@ -3,8 +3,8 @@ import type {
   DatabaseMetadata,
   ForeignKeyMetadata,
   TableMetadata,
-} from "../../adapter/index.js"
-import { fail } from "../../errors.js"
+} from "#src/adapter/index"
+import { fail } from "#src/errors"
 
 function normalize(value: string): string {
   return value.replaceAll("_", "").toLowerCase()

@@ -1,5 +1,5 @@
-import { fixtureLabel } from "../../authoring/types.js"
-import type { SeedPlanResult } from "../../engine/index.js"
+import { fixtureLabel } from "#src/authoring/types"
+import type { SeedPlanResult } from "#src/engine/index"
 
 function pad(value: string, width: number): string {
   return value.padEnd(width)

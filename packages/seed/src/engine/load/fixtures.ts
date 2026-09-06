@@ -1,8 +1,8 @@
 import { readdir } from "node:fs/promises"
 import { join } from "node:path"
 import { pathToFileURL } from "node:url"
-import type { Fixture, LoadedFixture } from "../../authoring/types.js"
-import { locate } from "../../errors.js"
+import type { Fixture, LoadedFixture } from "#src/authoring/types"
+import { locate } from "#src/errors"
 
 const MODULE_PATTERN = /\.(ts|mts|cts|js|mjs|cjs)$/
 

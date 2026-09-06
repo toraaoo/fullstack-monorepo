@@ -1,6 +1,6 @@
-export type { Builder, TableTypeMap } from "./authoring/builder.js"
-export { createBuilder } from "./authoring/builder.js"
-export { faker, seedFaker } from "./authoring/faker.js"
+export type { Builder, TableTypeMap } from "#src/authoring/builder"
+export { createBuilder } from "#src/authoring/builder"
+export { faker, seedFaker } from "#src/authoring/faker"
 export {
   env,
   file,
@@ -10,24 +10,32 @@ export {
   random,
   sql,
   uuid,
-} from "./authoring/helpers.js"
+} from "#src/authoring/helpers"
 export type {
   Descriptor,
   Fixture,
   FixtureRow,
   FixtureSpec,
   LoadedFixture,
-} from "./authoring/types.js"
-export type { ResolvedConfig, SeedConfig, SeedConfigInput } from "./config.js"
-export { defineSeedConfig, loadConfig } from "./config.js"
-export type { FixtureResult, RowChange } from "./engine/apply/upsert.js"
+} from "#src/authoring/types"
+export type {
+  ResolvedConfig,
+  SeedConfig,
+  SeedConfigInput,
+} from "#src/config"
+export { defineSeedConfig, loadConfig } from "#src/config"
+export type { FixtureResult, RowChange } from "#src/engine/apply/upsert"
 export type {
   SeedMode,
   SeedOptions,
   SeedPlanResult,
   SeedResult,
-} from "./engine/index.js"
-export { planSeed, seed } from "./engine/index.js"
-export { BASE_TIER } from "./engine/load/tiers.js"
-export type { BackfillStep, PlanStep, SeedPlan } from "./engine/plan/build.js"
-export { SeedError } from "./errors.js"
+} from "#src/engine/index"
+export { planSeed, seed } from "#src/engine/index"
+export { BASE_TIER } from "#src/engine/load/tiers"
+export type {
+  BackfillStep,
+  PlanStep,
+  SeedPlan,
+} from "#src/engine/plan/build"
+export { SeedError } from "#src/errors"

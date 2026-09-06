@@ -1,4 +1,4 @@
-import type { TableMetadata } from "../adapter/index.js"
+import type { TableMetadata } from "#src/adapter/index"
 
 export const RAW_SQL = Symbol.for("workspace.seed.raw")
 

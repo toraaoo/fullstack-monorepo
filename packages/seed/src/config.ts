@@ -1,9 +1,9 @@
 import { stat } from "node:fs/promises"
 import { dirname, isAbsolute, join, parse, resolve } from "node:path"
 import { pathToFileURL } from "node:url"
-import type { SeedAdapter } from "./adapter/index.js"
-import { BASE_TIER } from "./engine/load/tiers.js"
-import { fail } from "./errors.js"
+import type { SeedAdapter } from "#src/adapter/index"
+import { BASE_TIER } from "#src/engine/load/tiers"
+import { fail } from "#src/errors"
 
 export interface SeedConfig {
   adapter: SeedAdapter
