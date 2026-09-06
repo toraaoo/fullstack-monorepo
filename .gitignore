@@ -421,3 +421,8 @@ bun.lockb
 
 ### Editors ###
 .idea/
+
+### Testing ###
+coverage/
+**/tests/.tmp/
+.vitest-reports/

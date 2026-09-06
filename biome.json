@@ -16,7 +16,8 @@
       "!**/dist",
       "!**/lib/paraglide",
       "!**/project.inlang/cache",
-      "!apps/api/db/migrations"
+      "!apps/api/db/migrations",
+      "!**/tests/.tmp"
     ]
   },
   "formatter": {
