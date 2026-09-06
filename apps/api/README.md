@@ -10,6 +10,7 @@ NestJS 12 on the Express platform, with Drizzle, Pino and zod.
 - [Validation](#validation)
 - [Feature modules](#feature-modules)
 - [Database](#database)
+- [Testing](#testing)
 
 ---
 
@@ -312,3 +313,52 @@ db/
 
 Migrations, the JSON seeder and its directive language are documented in
 [database](../../docs/database.md).
+
+---
+
+## Testing
+
+```bash
+bun run test
+bun run test:watch
+bun run test:coverage
+```
+
+Unit tests live in `tests/unit/`, mirroring `src/`. `tests/support/` holds the test
+doubles and `tests/setup/unit.ts` fixes the environment every suite reads, so
+`getEnv()` and `DateUtils` are deterministic.
+
+**The config is `vitest.config.mts`, not `.ts`.** Two reasons, both forced:
+
+Vitest transpiles with esbuild, which [does not implement](https://esbuild.github.io/content-types/#no-type-system)
+`emitDecoratorMetadata`. Without it Nest sees no `design:paramtypes` and cannot resolve
+a constructor's dependencies, so `Test.createTestingModule` fails on every provider.
+The config runs `unplugin-swc` instead, which does emit that metadata. `tests/unit/harness.test.ts`
+asserts this still works, so a regression in the toolchain fails loudly rather than
+looking like a broken provider.
+
+This package emits CommonJS, so an ESM config file needs the `.mts` extension. The root
+`vitest.config.ts` globs both extensions.
+
+Two things follow from the CommonJS output, and both bite when writing a test:
+
+| Doing this | Use |
+| --- | --- |
+| Resolving a path in a test | `__dirname` — `import.meta` is a compile error here |
+| `await import()` of a source file | A relative specifier ending in `.js` — a path alias does not typecheck |
+
+Prefer plain constructors over `Test.createTestingModule`: a filter, interceptor or pipe
+takes its collaborators as arguments, so `new AllExceptionsFilter(cls)` is the whole
+setup. Reach for the testing module only where Nest resolves the dependency itself, as
+`DatabaseHealth` does through the `DRIZZLE` token.
+
+`getEnv()` caches its result and `envalid` calls `process.exit(1)` on a bad variable, so
+a suite cannot simply reassign `process.env` and call it again. To vary configuration,
+mock `@core/config` — `tests/unit/shared/all-exceptions.filter.test.ts` toggles
+`API_DEBUG_ERRORS` that way — or re-import the module after `vi.resetModules()`, as
+`tests/unit/core/env.test.ts` does.
+
+`tests/unit/core/i18n.test.ts` guards against translation drift: it reads every
+directory under `src/core/i18n/lang/`, so a new locale is checked the moment it lands,
+and fails when one locale is missing a key `en` defines, defines one `en` does not,
+disagrees about a message's `{placeholders}`, or leaves a message blank.

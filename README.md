@@ -193,6 +193,12 @@ Postgres 18 container started by Testcontainers. See
 
 `bun run test` never needs Docker. `bun run test:integration` does.
 
+`apps/api` is the one package that needs more than the snippet above. Vitest transpiles
+with esbuild, which ignores `emitDecoratorMetadata`, so Nest cannot resolve a
+constructor's dependencies — its config runs [`unplugin-swc`](https://github.com/unplugin/unplugin-swc)
+instead and is named `vitest.config.mts`, because the package emits CommonJS and the
+config file is ESM. See [its README](apps/api/README.md#testing).
+
 ---
 
 ## Docs
