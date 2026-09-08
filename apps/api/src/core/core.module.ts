@@ -7,6 +7,7 @@ import { I18nModule } from "./i18n/i18n.module"
 import { LoggerModule } from "./logger/logger.module"
 import { RequestContextModule } from "./request-context/request-context.module"
 import { ThrottlerModule } from "./throttler/throttler.module"
+import { VersioningModule } from "./versioning/versioning.module"
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { ThrottlerModule } from "./throttler/throttler.module"
     LoggerModule,
     DatabaseModule,
     I18nModule,
+    VersioningModule,
     ThrottlerModule,
   ],
   providers: [

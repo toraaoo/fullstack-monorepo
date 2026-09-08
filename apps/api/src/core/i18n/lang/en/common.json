@@ -7,6 +7,7 @@
   "unauthorized": "Unauthorized",
   "forbidden": "Forbidden",
   "not_found": "Resource not found",
+  "not_acceptable": "Not Acceptable",
   "conflict": "Conflict",
   "too_many_requests": "Too Many Requests",
   "service_unavailable": "Service Unavailable"

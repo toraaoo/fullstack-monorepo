@@ -7,6 +7,7 @@
   "unauthorized": "인증이 필요합니다",
   "forbidden": "접근 권한이 없습니다",
   "not_found": "리소스를 찾을 수 없습니다",
+  "not_acceptable": "허용되지 않는 요청 형식",
   "conflict": "충돌이 발생했습니다",
   "too_many_requests": "요청이 너무 많습니다",
   "service_unavailable": "서비스를 사용할 수 없습니다"

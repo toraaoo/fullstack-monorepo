@@ -1,5 +1,6 @@
 import "dotenv/config"
 import { CorsConfig, getEnv, HelmetConfig, swaggerConfig } from "@core/config"
+import { versioningConfig } from "@core/versioning"
 import { NestFactory } from "@nestjs/core"
 import type { NestExpressApplication } from "@nestjs/platform-express"
 import { SwaggerModule } from "@nestjs/swagger"
@@ -16,6 +17,8 @@ async function bootstrap() {
   })
 
   app.useLogger(app.get(Logger))
+
+  app.enableVersioning(versioningConfig)
 
   app.useGlobalPipes(new CustomValidationPipe())
 

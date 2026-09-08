@@ -49,6 +49,11 @@ const ERRORS = {
     code: errorCodes.notFound,
     description: "Resource not found",
   },
+  notAcceptable: {
+    status: 406,
+    code: errorCodes.notAcceptable,
+    description: "Unsupported API version in the Accept header",
+  },
   conflict: {
     status: 409,
     code: errorCodes.conflict,
@@ -83,6 +88,7 @@ const DEFAULT_ERRORS: Record<ErrorName, boolean> = {
   unauthorized: true,
   forbidden: true,
   notFound: false,
+  notAcceptable: true,
   conflict: false,
   validation: true,
   tooManyRequests: true,
