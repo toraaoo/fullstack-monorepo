@@ -78,7 +78,7 @@ describe("ApiStandardResponses", () => {
 
   it("documents the errors every route can return", () => {
     expect(Object.keys(responsesOf(Defaults.prototype.handler)).sort()).toEqual(
-      ["400", "401", "403", "422", "429", "500"]
+      ["400", "401", "403", "406", "422", "429", "500"]
     )
   })
 

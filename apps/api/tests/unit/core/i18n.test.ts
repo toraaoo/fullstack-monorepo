@@ -14,6 +14,7 @@ const REQUIRED_KEYS = [
   "common.unauthorized",
   "common.forbidden",
   "common.not_found",
+  "common.not_acceptable",
   "common.conflict",
   "common.too_many_requests",
   "common.internal_error",

@@ -1,5 +1,6 @@
 import { CoreModule } from "@core"
 import { CorsConfig, HelmetConfig } from "@core/config"
+import { versioningConfig } from "@core/versioning"
 import type { INestApplication } from "@nestjs/common"
 import { Test, type TestingModuleBuilder } from "@nestjs/testing"
 import { CustomValidationPipe } from "@shared"
@@ -19,6 +20,7 @@ async function boot(builder: TestingModuleBuilder): Promise<TestApp> {
   const moduleRef = await builder.compile()
   const app = moduleRef.createNestApplication({ logger: false })
 
+  app.enableVersioning(versioningConfig)
   app.useGlobalPipes(new CustomValidationPipe())
   app.enableCors(CorsConfig)
   app.use(helmet(HelmetConfig))

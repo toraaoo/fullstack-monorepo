@@ -1,3 +1,4 @@
+import { API_VERSIONS, LATEST_API_VERSION } from "@core/versioning"
 import { Test } from "@nestjs/testing"
 import { I18nService } from "nestjs-i18n"
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest"
@@ -43,6 +44,15 @@ describe("GET /", () => {
     expect(response.data).toMatchObject({
       appName: "API",
       appVersion: "1.0.0",
+    })
+  })
+
+  it("advertises the API versions a client may ask for", async () => {
+    const response = (await controller()).getHello()
+
+    expect(response.data).toMatchObject({
+      apiVersion: LATEST_API_VERSION,
+      apiVersions: [...API_VERSIONS],
     })
   })
 
