@@ -131,6 +131,9 @@ than `baseUrl` is deliberate: the server client and the browser client point at
 different hosts but share a scope, so a query prefetched during SSR hydrates the browser
 cache instead of refetching on mount.
 
+Setting `apiVersion` appends `#vN` to the default scope, so two clients on the same host
+pinned to different versions do not share a cache entry.
+
 ---
 
 ## Adding a resource
@@ -175,6 +178,7 @@ still unwraps and still throws on failure, it just returns `void`.
 | `baseUrl` | — | Required. Trailing slashes are stripped |
 | `scope` | `baseUrl` | Query-key namespace; set it to share a cache across hosts |
 | `locale` | — | Sent as `x-lang` |
+| `apiVersion` | — | Sent as `Accept: application/json;v=N`. Omit it to take the API's latest |
 | `headers` | — | Object or a sync/async function, resolved per request |
 | `timeout` | `10_000` | Milliseconds |
 | `retry` | GET, 2 attempts | `false` to disable |

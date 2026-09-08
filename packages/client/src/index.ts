@@ -5,7 +5,11 @@ export {
   type ApiErrorOptions,
   toApiError,
 } from "./core/error"
-export { DEFAULT_TIMEOUT, normalizeBaseUrl } from "./core/http"
+export {
+  acceptHeaderFor,
+  DEFAULT_TIMEOUT,
+  normalizeBaseUrl,
+} from "./core/http"
 export type {
   ClientHooks,
   ClientOptions,

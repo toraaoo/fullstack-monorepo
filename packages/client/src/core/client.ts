@@ -8,6 +8,7 @@ export type Client = Resources & {
   readonly baseUrl: string
   readonly scope: string
   readonly locale?: string
+  readonly apiVersion?: string
   readonly $http: AxiosInstance
   readonly $fetch: RequestContext["fetch"]
   readonly $send: RequestContext["send"]
@@ -16,7 +17,9 @@ export type Client = Resources & {
 
 export function createClient(options: ClientOptions): Client {
   const baseUrl = normalizeBaseUrl(options.baseUrl)
-  const scope = options.scope ?? baseUrl
+  const scope =
+    options.scope ??
+    (options.apiVersion ? `${baseUrl}#v${options.apiVersion}` : baseUrl)
   const http = createHttp(options)
 
   const { fetch, send } = createRequester({
@@ -48,6 +51,7 @@ export function createClient(options: ClientOptions): Client {
     baseUrl,
     scope,
     locale: options.locale,
+    apiVersion: options.apiVersion,
     $http: http,
     $fetch: fetch,
     $send: send,

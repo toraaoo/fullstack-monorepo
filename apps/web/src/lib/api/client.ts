@@ -3,6 +3,7 @@ import { apiOrigin, publicApiOrigin } from "@/lib/env"
 
 const SERVER_TIMEOUT_MS = 2_000
 const API_SCOPE = "api"
+const API_VERSION = "1"
 
 const clients = new Map<string, Client>()
 
@@ -21,6 +22,7 @@ function client(
   const created = createClient({
     baseUrl,
     scope: API_SCOPE,
+    apiVersion: API_VERSION,
     locale,
     timeout,
   })

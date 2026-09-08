@@ -34,6 +34,7 @@ export type ClientOptions = {
   baseUrl: string
   scope?: string
   locale?: string
+  apiVersion?: string
   headers?: HeaderSource
   timeout?: number
   retry?: RetryOptions | false
