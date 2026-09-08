@@ -5,6 +5,7 @@ NestJS 12 on the Express platform, with Drizzle, Pino and zod.
 - [Layers](#layers)
 - [Scripts](#scripts)
 - [Configuration](#configuration)
+- [Versioning](#versioning)
 - [Request pipeline](#request-pipeline)
 - [Language](#language)
 - [Validation](#validation)
@@ -28,6 +29,7 @@ flowchart TD
     CORE --> LOG["logger · pino"]
     CORE --> DB["database · drizzle"]
     CORE --> I18N["i18n"]
+    CORE --> VER["versioning"]
     CORE --> THR["throttler"]
 
     MOD --> HEALTH["health"]
@@ -55,6 +57,7 @@ src/
     logger/        nestjs-pino, redaction, request-id correlation
     request-context/  nestjs-cls, the x-request-id header
     throttler/     rate limiting
+    versioning/    Accept-header version negotiation
 
   shared/          stateless; importable from anywhere
     decorators/    Swagger response decorators, @RawResponse, @ResponseMessage
@@ -136,6 +139,65 @@ Set `API_DOCS_ENABLED=true` to mount the Scalar API reference at `/docs`.
 
 ---
 
+## Versioning
+
+The version travels in `Accept`, as a media type parameter. Paths never carry it, so a
+URL means the same resource forever.
+
+```bash
+curl -H "Accept: application/json;v=1" http://localhost:8000/   # pinned
+curl http://localhost:8000/                                     # latest
+```
+
+Every answer names the version it was served as:
+
+```
+x-api-version: 1
+vary: Accept
+```
+
+**Omitting the version gets the latest.** That keeps unversioned callers — health
+probes, `curl`, a browser address bar — working, at the cost that they move when a new
+version ships. A client that must not move should send the parameter; `@workspace/client`
+does, from its `apiVersion` option.
+
+A version the API does not serve is refused up front with `406 Not Acceptable` and a
+`NOT_ACCEPTABLE` envelope, rather than a 404 that cannot be told from a typo in the path.
+
+`GET /` lists what is on offer, so a client can discover the range without reading docs:
+
+```json
+{ "apiVersion": "1", "apiVersions": ["1"] }
+```
+
+### Adding a version
+
+1. Append it to `API_VERSIONS` in `src/core/versioning/versioning.constants.ts`. It is
+   ordered oldest to newest, and the last entry is the latest.
+2. Leave every controller alone. Handlers with no `@Version` serve **all** supported
+   versions, which is right for the endpoints a release did not change.
+3. Only where the shape actually breaks, split the handler:
+
+```ts
+@Get()
+@Version("1")
+findAllV1() {}
+
+@Get()
+@Version("2")
+findAll() {}
+```
+
+`HealthController` is `VERSION_NEUTRAL` — orchestrators send `Accept: */*` and should
+never be routed by version.
+
+The negotiation itself is a pure function in `src/core/versioning/accept-version.ts`: it
+reads `v` off any media type that can carry JSON, orders candidates by `q`, and picks the
+best one the API supports. `ApiVersionMiddleware` runs it before routing, sets the
+response headers, and raises the 406.
+
+---
+
 ## Request pipeline
 
 Nothing in a handler deals with envelopes, request ids or translation. That is all
@@ -145,13 +207,15 @@ wired globally in `CoreModule`.
 flowchart TD
     R([request]) --> CLS["ClsMiddleware<br/>x-request-id in and out"]
     CLS --> LOG["pino-http<br/>redacts authorization + cookies"]
-    LOG --> THR["ThrottlerGuard"]
+    LOG --> VER["ApiVersionMiddleware<br/>Accept → x-api-version, or 406"]
+    VER --> THR["ThrottlerGuard"]
     THR --> PIPE["CustomValidationPipe"]
     PIPE --> H["controller"]
     H --> INT["ResponseInterceptor"]
     INT --> RES([response])
 
-    PIPE -. throws .-> F["AllExceptionsFilter"]
+    VER -. throws .-> F["AllExceptionsFilter"]
+    PIPE -. throws .-> F
     H -. throws .-> F
     F --> RES
 

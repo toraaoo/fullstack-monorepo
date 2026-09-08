@@ -4,6 +4,7 @@ How a request travels, what it looks like on the wire, and the conventions that 
 the two apps in agreement.
 
 - [Request flow](#request-flow)
+- [API versioning](#api-versioning)
 - [Response envelope](#response-envelope)
 - [The API pipeline](#the-api-pipeline)
 - [Calling the API from the web](#calling-the-api-from-the-web)
@@ -43,6 +44,32 @@ client's `scope`, not its `baseUrl` — the two differ by design.
 
 ---
 
+## API versioning
+
+The version is negotiated through `Accept`, never through the path:
+
+```http
+Accept: application/json;v=1
+```
+
+The API answers with `x-api-version` and `Vary: Accept`. A request that names no version
+gets the latest; a request that names one the API does not serve gets `406` with a
+`NOT_ACCEPTABLE` envelope. `GET /` reports `apiVersion` and `apiVersions` so a client can
+discover the range.
+
+The media type, the `v` parameter and the response header are defined once in
+`@workspace/schemas/http`, so both sides agree on the wire format. The list of versions
+the API actually serves is the API's own business, in
+`apps/api/src/core/versioning/versioning.constants.ts`.
+
+`@workspace/client` sends the header from its `apiVersion` option; `apps/web` pins it, so
+an API release cannot silently move the web app onto a new contract. Health endpoints are
+version-neutral — orchestrators send `Accept: */*`.
+
+Details, and how to add a version, in [`apps/api/README.md`](../apps/api/README.md#versioning).
+
+---
+
 ## Response envelope
 
 Every JSON response the API returns carries the same shape, defined once in
@@ -61,9 +88,10 @@ Every JSON response the API returns carries the same shape, defined once in
 }
 ```
 
-`code` is one of nine machine-readable values — `BAD_REQUEST`, `VALIDATION_FAILED`,
-`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `CONFLICT`, `TOO_MANY_REQUESTS`,
-`INTERNAL_ERROR`, `SERVICE_UNAVAILABLE`. `requestId` is attached on 5xx only and matches
+`code` is one of ten machine-readable values — `BAD_REQUEST`, `VALIDATION_FAILED`,
+`UNAUTHORIZED`, `FORBIDDEN`, `NOT_FOUND`, `NOT_ACCEPTABLE`, `CONFLICT`,
+`TOO_MANY_REQUESTS`, `INTERNAL_ERROR`, `SERVICE_UNAVAILABLE`. `requestId` is attached on
+5xx only and matches
 the `x-request-id` response header, so a user-reported error maps to a log line.
 
 Health endpoints opt out with `@RawResponse()` — Terminus has its own well-known body
@@ -77,7 +105,8 @@ that orchestrators already understand.
 flowchart TD
     R([request]) --> CLS["ClsMiddleware<br/>request id → x-request-id"]
     CLS --> LOG["pino-http<br/>redacts auth + cookies"]
-    LOG --> THR["ThrottlerGuard"]
+    LOG --> VER["ApiVersionMiddleware<br/>Accept → x-api-version"]
+    VER --> THR["ThrottlerGuard"]
     THR --> PIPE["CustomValidationPipe<br/>zod → 422 field map"]
     PIPE --> H["controller + service"]
     H --> DB[("DatabaseModule<br/>drizzle + postgres.js")]
