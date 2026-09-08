@@ -1,9 +1,10 @@
-import { createHash, randomBytes, scryptSync } from "node:crypto"
+import { createHash, randomBytes } from "node:crypto"
 import { readFile } from "node:fs/promises"
 import { isAbsolute, join } from "node:path"
 import { type Descriptor, isDescriptor } from "#src/authoring/types"
 import { raw, type SeedRow } from "#src/dialect/index"
 import { fail } from "#src/errors"
+import { type HasherRegistry, selectHasher } from "#src/hashers"
 
 const UUID_NAMESPACE = "0f9c4a2e-8a5d-4b53-9a6f-2f9b1c7d4e10"
 
@@ -16,14 +17,6 @@ const MILLISECONDS: Record<string, number> = {
   h: 3_600_000,
   d: 86_400_000,
   w: 604_800_000,
-}
-
-const SCRYPT = {
-  N: 16_384,
-  r: 8,
-  p: 1,
-  keyLength: 64,
-  maxmem: 64 * 1024 * 1024,
 }
 
 export type RandomSource = (bytes: number) => Buffer
@@ -98,6 +91,7 @@ export interface ResolveContext {
   now: Date
   directory: string
   random: RandomSource
+  hashers?: HasherRegistry
   from?: { table: string; column: string }
   lookupRef(request: RefRequest): Promise<unknown>
 }
@@ -135,25 +129,11 @@ async function resolveDescriptor(
         .toString("hex")
         .slice(0, value.length)
 
-    case "hash": {
-      const salt = context.random(16)
-
-      const derived = scryptSync(value.plaintext, salt, SCRYPT.keyLength, {
-        N: SCRYPT.N,
-        r: SCRYPT.r,
-        p: SCRYPT.p,
-        maxmem: SCRYPT.maxmem,
-      })
-
-      return [
-        "scrypt",
-        SCRYPT.N,
-        SCRYPT.r,
-        SCRYPT.p,
-        salt.toString("base64"),
-        derived.toString("base64"),
-      ].join("$")
-    }
+    case "hash":
+      return selectHasher(value.format, context.hashers)(
+        value.plaintext,
+        context.random
+      )
 
     case "env": {
       const found = process.env[value.name] ?? value.fallback

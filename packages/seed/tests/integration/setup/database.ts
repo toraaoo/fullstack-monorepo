@@ -5,6 +5,7 @@ import { drizzleAdapter } from "#src/adapter/drizzle"
 import type { SeedAdapter } from "#src/adapter/index"
 import { postgresAdapter } from "#src/adapter/postgres"
 import type { ResolvedConfig } from "#src/config"
+import { builtinHashers } from "#src/hashers"
 import { DDL, schema } from "./schema"
 
 let sequence = 0
@@ -93,6 +94,7 @@ export async function createTestDatabase(): Promise<TestDatabase> {
         adapter: database.drizzleAdapter,
         baseTier: "base",
         protectedEnvironments: ["staging", "production"],
+        hashers: builtinHashers,
         ...overrides,
       }
     },

@@ -10,6 +10,7 @@ import {
   resolveValue,
 } from "#src/engine/apply/resolve"
 import { SeedError } from "#src/errors"
+import { resolveHashers } from "#src/hashers"
 import { tempTree } from "../../../support/temp"
 
 const NOW = new Date("2024-06-15T12:00:00.000Z")
@@ -175,7 +176,7 @@ describe("random", () => {
 describe("hash", () => {
   it("produces a verifiable scrypt digest", async () => {
     const value = (await resolve(
-      descriptor({ kind: "hash", plaintext: "hunter2" })
+      descriptor({ kind: "hash", plaintext: "hunter2", format: "scrypt" })
     )) as string
 
     const [scheme, n, r, p, salt, derived] = value.split("$")
@@ -195,12 +196,39 @@ describe("hash", () => {
 
   it("salts each call, so the same plaintext hashes differently", async () => {
     const source = createRandomSource(5)
-    const body = descriptor({ kind: "hash", plaintext: "hunter2" })
+    const body = descriptor({
+      kind: "hash",
+      plaintext: "hunter2",
+      format: "scrypt",
+    })
 
     const first = await resolve(body, { random: source })
     const second = await resolve(body, { random: source })
 
     expect(first).not.toBe(second)
+  })
+
+  it("routes the descriptor format to the registry on the context", async () => {
+    const value = await resolve(
+      descriptor({ kind: "hash", plaintext: "hunter2", format: "argon2" }),
+      { hashers: resolveHashers({ argon2: (plain) => `argon2$${plain}` }) }
+    )
+
+    expect(value).toBe("argon2$hunter2")
+  })
+
+  it("falls back to the built-in registry when the context has none", async () => {
+    const value = (await resolve(
+      descriptor({ kind: "hash", plaintext: "Qwe123!!", format: "better-auth" })
+    )) as string
+
+    expect(value).toMatch(/^[0-9a-f]{32}:[0-9a-f]{128}$/)
+  })
+
+  it("reports an unknown format", async () => {
+    await expect(
+      resolve(descriptor({ kind: "hash", plaintext: "x", format: "bcrypt" }))
+    ).rejects.toThrow(/hash\(\.\.\., "bcrypt"\) — unknown format/)
   })
 })
 

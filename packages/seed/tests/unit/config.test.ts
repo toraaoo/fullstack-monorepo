@@ -1,7 +1,9 @@
+import { randomBytes } from "node:crypto"
 import { isAbsolute, join } from "node:path"
 import { describe, expect, it } from "vitest"
 import { defineSeedConfig, loadConfig } from "#src/config"
 import { SeedError } from "#src/errors"
+import { builtinHashers, selectHasher } from "#src/hashers"
 import { tempTree } from "../support/temp"
 
 const ADAPTER = `{
@@ -202,5 +204,38 @@ describe("defaults", () => {
     })
 
     expect((await loadConfig(root)).protectedEnvironments).toEqual([])
+  })
+
+  it("exposes the built-in hashers when none are registered", async () => {
+    const root = await tempTree({
+      "seed.config.ts": config(`{ adapter: ${ADAPTER} }`),
+    })
+
+    expect((await loadConfig(root)).hashers).toBe(builtinHashers)
+  })
+
+  it("registers custom hashers beside the built-ins", async () => {
+    const root = await tempTree({
+      "seed.config.ts": config(
+        `{ adapter: ${ADAPTER}, hashers: { argon2: (plain) => "argon2$" + plain } }`
+      ),
+    })
+
+    const { hashers } = await loadConfig(root)
+
+    expect(selectHasher("argon2", hashers)("x", randomBytes)).toBe("argon2$x")
+    expect(hashers["better-auth"]).toBe(builtinHashers["better-auth"])
+  })
+
+  it("refuses a hasher that is not a function", async () => {
+    const root = await tempTree({
+      "seed.config.ts": config(
+        `{ adapter: ${ADAPTER}, hashers: { argon2: "nope" } }`
+      ),
+    })
+
+    await expect(loadConfig(root)).rejects.toThrow(
+      'hashers["argon2"] is not a function'
+    )
   })
 })

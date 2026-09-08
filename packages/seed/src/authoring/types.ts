@@ -25,6 +25,7 @@ export interface RandomBody {
 export interface HashBody {
   kind: "hash"
   plaintext: string
+  format: string
 }
 
 export interface EnvBody {

@@ -1,5 +1,6 @@
 import { type Descriptor, descriptor } from "#src/authoring/types"
 import { fail } from "#src/errors"
+import { DEFAULT_HASHER } from "#src/hashers"
 
 const MAX_RANDOM_LENGTH = 512
 
@@ -21,10 +22,14 @@ export function random(length = 32): Descriptor {
   return descriptor({ kind: "random", length })
 }
 
-export function hash(plaintext: string): Descriptor {
+export function hash(
+  plaintext: string,
+  format: string = DEFAULT_HASHER
+): Descriptor {
   if (!plaintext) fail("hash() needs a plaintext")
+  if (!format) fail("hash() needs a format name")
 
-  return descriptor({ kind: "hash", plaintext })
+  return descriptor({ kind: "hash", plaintext, format })
 }
 
 export function env(name: string, fallback?: string): Descriptor {

@@ -116,7 +116,7 @@ volatile, don't rewrite it every time".
 | `now(offset?)` | Run clock, optionally shifted — `now("-30d")`, `now("+2h")`. Units `ms s m h d w M y` |
 | `uuid(key?)` | Random v4, or a deterministic v5 from `key` — same key, same id, every run |
 | `random(length?)` | Random hex, default 32 characters |
-| `hash(plaintext)` | scrypt, `scrypt$N$r$p$salt$key` |
+| `hash(plaintext, format?)` | Password digest in the named format, default `scrypt` |
 | `env(name, fallback?)` | Environment variable; throws when unset with no fallback |
 | `sql(expression)` | Raw SQL passed into the statement instead of a bound parameter |
 | `file(path, encoding?)` | A file next to the fixture, as a Buffer or decoded text |
@@ -128,6 +128,36 @@ cannot reach it.
 
 For a fixed date, write `new Date("2024-01-15")`. For a random integer or a choice,
 use `faker.number.int()` and `faker.helpers.arrayElement()`.
+
+### Hash formats
+
+`hash()` writes whatever digest string the code that reads the column expects, so the
+format is part of the call:
+
+| Format | Output | Parameters |
+| --- | --- | --- |
+| `scrypt` (default) | `scrypt$N$r$p$saltB64$keyB64` | N 16384, r 8, p 1, 64-byte key |
+| `better-auth` | `saltHex:keyHex` | N 16384, r 16, p 1, 64-byte key, plaintext NFKC-normalized |
+
+```ts
+password: hash("Qwe123!!", "better-auth")
+```
+
+Anything else registers by name in `seed.config.ts`, which is also how you override a
+built-in:
+
+```ts
+export default defineSeedConfig({
+  adapter,
+  hashers: {
+    argon2: (plaintext, random) => argon2Sync(plaintext, random(16)),
+  },
+})
+```
+
+A hasher takes the plaintext and the run's random source — draw salt bytes from that
+source rather than from `crypto`, so `--seed` keeps the run reproducible. An unknown
+format fails the run and names the ones that are registered.
 
 ---
 
@@ -324,6 +354,7 @@ identifiers and parameters distinct so each adapter can bind them its own way.
 src/
   index.ts        public surface
   config.ts       defineSeedConfig, config discovery
+  hashers.ts      hash formats, built-in and registered
   errors.ts       SeedError
 
   authoring/      what a fixture file imports

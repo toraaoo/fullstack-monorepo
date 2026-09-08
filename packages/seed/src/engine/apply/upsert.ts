@@ -11,6 +11,7 @@ import type { SeedPlan } from "#src/engine/plan/build"
 import type { Catalog } from "#src/engine/plan/catalog"
 import { KEY_SEPARATOR } from "#src/engine/plan/graph"
 import { fail } from "#src/errors"
+import type { HasherRegistry } from "#src/hashers"
 
 export interface ColumnChange {
   column: string
@@ -36,6 +37,7 @@ export interface FixtureResult {
 export interface ApplyOptions {
   seed?: number
   diff?: boolean
+  hashers?: HasherRegistry
 }
 
 function keyOf(row: SeedRow, columns: readonly string[]): string {
@@ -207,6 +209,7 @@ export async function applyPlan(
     const context: ResolveContext = {
       now,
       random,
+      hashers: options.hashers,
       directory: step.fixture.directory,
       lookupRef: lookup.find,
     }
@@ -273,6 +276,7 @@ export async function applyPlan(
     const context: ResolveContext = {
       now,
       random,
+      hashers: options.hashers,
       directory: backfill.fixture.directory,
       lookupRef: lookup.find,
     }

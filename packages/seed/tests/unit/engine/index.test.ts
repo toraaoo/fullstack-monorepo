@@ -2,6 +2,7 @@ import { join } from "node:path"
 import { beforeEach, describe, expect, it, vi } from "vitest"
 import type { ResolvedConfig } from "#src/config"
 import { planSeed, seed } from "#src/engine/index"
+import { builtinHashers } from "#src/hashers"
 import { memoryAdapter } from "../../support/adapter"
 import { metadata, table } from "../../support/metadata"
 
@@ -35,6 +36,7 @@ function configWith(
     adapter,
     baseTier: "base",
     protectedEnvironments: ["staging", "production"],
+    hashers: builtinHashers,
     ...overrides,
   }
 }

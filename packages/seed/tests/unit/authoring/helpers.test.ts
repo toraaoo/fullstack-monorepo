@@ -53,15 +53,28 @@ describe("random", () => {
 })
 
 describe("hash", () => {
-  it("captures the plaintext", () => {
+  it("captures the plaintext and defaults to scrypt", () => {
     expect(hash("hunter2")).toMatchObject({
       kind: "hash",
       plaintext: "hunter2",
+      format: "scrypt",
+    })
+  })
+
+  it("captures an explicit format", () => {
+    expect(hash("Qwe123!!", "better-auth")).toMatchObject({
+      kind: "hash",
+      plaintext: "Qwe123!!",
+      format: "better-auth",
     })
   })
 
   it("refuses an empty plaintext", () => {
     expect(() => hash("")).toThrow("hash() needs a plaintext")
+  })
+
+  it("refuses an empty format", () => {
+    expect(() => hash("hunter2", "")).toThrow("hash() needs a format name")
   })
 })
 

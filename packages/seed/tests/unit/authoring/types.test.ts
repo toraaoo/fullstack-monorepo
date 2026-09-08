@@ -49,7 +49,11 @@ describe("isDeterministic", () => {
     ["file", descriptor({ kind: "file", path: "avatar.png" }), true],
     ["now", descriptor({ kind: "now" }), false],
     ["random", descriptor({ kind: "random", length: 8 }), false],
-    ["hash", descriptor({ kind: "hash", plaintext: "hunter2" }), false],
+    [
+      "hash",
+      descriptor({ kind: "hash", plaintext: "hunter2", format: "scrypt" }),
+      false,
+    ],
     ["once", descriptor({ kind: "once", value: 1 }), false],
   ])("treats %s as deterministic=%s", (_label, value, expected) => {
     expect(isDeterministic(value)).toBe(expected)

@@ -95,7 +95,7 @@ export async function seed(
         catalog,
         config.adapter.dialect,
         plan,
-        { seed: options.seed, diff: mode === "diff" }
+        { seed: options.seed, diff: mode === "diff", hashers: config.hashers }
       )
 
       if (mode === "diff") throw new Rollback()

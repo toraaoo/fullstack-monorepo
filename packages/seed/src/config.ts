@@ -4,12 +4,14 @@ import { pathToFileURL } from "node:url"
 import type { SeedAdapter } from "#src/adapter/index"
 import { BASE_TIER } from "#src/engine/load/tiers"
 import { fail } from "#src/errors"
+import { type Hasher, type HasherRegistry, resolveHashers } from "#src/hashers"
 
 export interface SeedConfig {
   adapter: SeedAdapter
   fixtures?: string
   baseTier?: string
   protectedEnvironments?: string[]
+  hashers?: Record<string, Hasher>
 }
 
 export type SeedConfigInput =
@@ -26,6 +28,7 @@ export interface ResolvedConfig {
   adapter: SeedAdapter
   baseTier: string
   protectedEnvironments: string[]
+  hashers: HasherRegistry
 }
 
 const CONFIG_FILES = [
@@ -105,5 +108,6 @@ export async function loadConfig(
       "staging",
       "production",
     ],
+    hashers: resolveHashers(config.hashers),
   }
 }

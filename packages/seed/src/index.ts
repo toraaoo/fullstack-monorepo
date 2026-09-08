@@ -39,3 +39,14 @@ export type {
   SeedPlan,
 } from "#src/engine/plan/build"
 export { SeedError } from "#src/errors"
+export type {
+  Hasher,
+  HasherRegistry,
+  HashRandomSource,
+} from "#src/hashers"
+export {
+  builtinHashers,
+  DEFAULT_HASHER,
+  resolveHashers,
+  selectHasher,
+} from "#src/hashers"
