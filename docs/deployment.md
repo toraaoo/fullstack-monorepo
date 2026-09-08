@@ -136,13 +136,13 @@ container ID, which Next tries to bind and fails.
 `/var/lib/postgresql`, not `/var/lib/postgresql/data`. The old path leaves the container
 unhealthy at startup.
 
-**Migrations are not applied by the image.** `drizzle-kit` is a devDependency, so
-`bun run db:migrate` is a development and CI command — neither the API container nor
-`compose.yaml` runs it at startup. Apply pending migrations from your deploy pipeline,
-against the target database, before rolling the new image. Seeding is the same:
+**The schema is not applied by the image.** `drizzle-kit` is a devDependency, so
+`bun run db:push` is a development and CI command — neither the API container nor
+`compose.yaml` runs it at startup. Apply the schema from your deploy pipeline, against
+the target database, before rolling the new image. Seeding is the same:
 `bun run db:seed` applies the `base` fixtures and is safe to re-run anywhere, and
 environment fixtures are opt-in: `bun run db:seed <environment>`. See
-[database](database.md#migrations).
+[database](database.md#applying-the-schema).
 
 **Postgres is published on the loopback interface** in `compose.yaml`, so `drizzle-kit`
 and the seeder can reach it from the host. `POSTGRES_BIND` and `POSTGRES_PORT` change

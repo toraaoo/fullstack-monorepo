@@ -1,11 +1,10 @@
+import { execFile } from "node:child_process"
 import { join } from "node:path"
+import { promisify } from "node:util"
 import {
   PostgreSqlContainer,
   type StartedPostgreSqlContainer,
 } from "@testcontainers/postgresql"
-import { drizzle } from "drizzle-orm/postgres-js"
-import { migrate } from "drizzle-orm/postgres-js/migrator"
-import postgres from "postgres"
 import type { TestProject } from "vitest/node"
 
 declare module "vitest" {
@@ -14,7 +13,9 @@ declare module "vitest" {
   }
 }
 
-const MIGRATIONS = join(__dirname, "../../../db/migrations")
+const run = promisify(execFile)
+
+const API_ROOT = join(__dirname, "../../..")
 
 let container: StartedPostgreSqlContainer | undefined
 
@@ -26,15 +27,11 @@ export async function setup(project: TestProject): Promise<void> {
     .start()
 
   const url = container.getConnectionUri()
-  const client = postgres(url, { max: 1 })
 
-  try {
-    await migrate(drizzle(client, { casing: "snake_case" }), {
-      migrationsFolder: MIGRATIONS,
-    })
-  } finally {
-    await client.end()
-  }
+  await run("bunx", ["drizzle-kit", "push", "--force"], {
+    cwd: API_ROOT,
+    env: { ...process.env, DATABASE_URL: url, DATABASE_SSL: "false" },
+  })
 
   project.provide("databaseUrl", url)
 }

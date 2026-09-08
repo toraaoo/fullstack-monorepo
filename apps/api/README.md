@@ -117,9 +117,7 @@ bun run typecheck
 | `dev` | `nest start --watch` |
 | `build` | `nest build`, then `tsc-alias` over `tsconfig.build.json` → `dist/` |
 | `start:prod` | `node dist/main` |
-| `db:generate` | Diff the schema into a migration under `db/migrations/` |
-| `db:migrate` | Apply pending migrations |
-| `db:check` | Verify migrations against the schema |
+| `db:push` | Push the drizzle schema straight to the database |
 | `db:studio` | Drizzle Studio |
 | `db:seed` | Apply JSON fixtures: `bun run db:seed local`. `--help` for flags |
 
@@ -370,13 +368,12 @@ Everything else about the database is tooling and lives in `db/`, outside `src/`
 
 ```
 db/
-  migrations/    generated SQL
   fixtures/      seed data — base/ plus one directory per environment
   seeder/        the seed runner
 ```
 
-Migrations, the JSON seeder and its directive language are documented in
-[database](../../docs/database.md).
+The schema is applied with `drizzle-kit push`, not migration files. The JSON seeder
+and its directive language are documented in [database](../../docs/database.md).
 
 ---
 
@@ -395,7 +392,7 @@ doubles and `tests/setup/unit.ts` fixes the environment every suite reads, so
 
 Integration tests live in `tests/integration/` and drive the assembled app over real
 HTTP against a throwaway Postgres 18 container. `setup/container.ts` is the global
-setup: it starts the container, applies `db/migrations` with the Drizzle migrator, and
+setup: it starts the container, applies the schema with `drizzle-kit push`, and
 hands the connection string to each worker through `project.provide`. `setup/env.ts`
 then writes it into `process.env` before any application module loads — `getEnv()`
 reads the environment once at import and caches, so the order matters.
