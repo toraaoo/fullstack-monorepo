@@ -7,6 +7,7 @@ import { Input } from "@workspace/ui/components/input"
 import { Label } from "@workspace/ui/components/label"
 import * as React from "react"
 import { z } from "zod"
+import { useLocale } from "@/lib/i18n/client"
 import { m } from "@/lib/paraglide/messages"
 import type { Locale } from "@/lib/paraglide/runtime"
 
@@ -20,7 +21,8 @@ function accessSchema(locale: Locale) {
   })
 }
 
-export function AccessForm({ locale }: { locale: Locale }) {
+export function AccessForm() {
+  const locale = useLocale()
   const [accepted, setAccepted] = React.useState<string | null>(null)
 
   const form = useForm({

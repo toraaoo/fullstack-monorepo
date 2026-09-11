@@ -3,16 +3,9 @@ import type * as React from "react"
 import { LocaleSwitcher } from "@/components/locale-switcher"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { m } from "@/lib/paraglide/messages"
-import type { Locale } from "@/lib/paraglide/runtime"
 import { MICRO_LABEL } from "@/lib/typography"
 
-export function SiteShell({
-  locale,
-  children,
-}: {
-  locale: Locale
-  children: React.ReactNode
-}) {
+export function SiteShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative flex min-h-svh flex-col">
       <Backdrop />
@@ -21,13 +14,13 @@ export function SiteShell({
         <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-6">
           <div className="flex min-w-0 items-center">
             <span className="truncate font-semibold text-[0.9375rem] tracking-tight">
-              {m["app.name"]({}, { locale })}
+              {m["app.name"]()}
             </span>
           </div>
 
           <div className="flex shrink-0 items-center gap-1.5">
-            <LocaleSwitcher locale={locale} />
-            <ThemeToggle locale={locale} />
+            <LocaleSwitcher />
+            <ThemeToggle />
           </div>
         </div>
       </header>
@@ -37,7 +30,7 @@ export function SiteShell({
       <footer className="mx-auto w-full max-w-5xl px-6 pt-16 pb-10">
         <div className="border-border/60 border-t pt-6">
           <p className={cn("text-muted-foreground/70", MICRO_LABEL)}>
-            {m["app.footer.note"]({}, { locale })}
+            {m["app.footer.note"]()}
           </p>
         </div>
       </footer>

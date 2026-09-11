@@ -27,7 +27,7 @@ sequenceDiagram
     participant D as postgres
 
     B->>W: GET /
-    W->>W: getServerLocale() — cookie, then Accept-Language
+    W->>W: proxy.ts — locale from cookie, then Accept-Language
     W->>A: GET /health (API_URL, x-lang)
     A->>D: SELECT 1
     D-->>A: ok

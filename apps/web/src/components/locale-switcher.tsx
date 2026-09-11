@@ -1,6 +1,7 @@
 "use client"
 
 import { cn } from "@workspace/ui/lib/utils"
+import { useLocale } from "@/lib/i18n/client"
 import { m } from "@/lib/paraglide/messages"
 import { type Locale, locales, setLocale } from "@/lib/paraglide/runtime"
 
@@ -9,7 +10,9 @@ const LOCALE_LABELS: Record<Locale, string> = {
   ko: "한국어",
 }
 
-export function LocaleSwitcher({ locale }: { locale: Locale }) {
+export function LocaleSwitcher() {
+  const locale = useLocale()
+
   return (
     <fieldset className="flex min-w-0 items-center gap-0.5 rounded-lg border border-border/70 p-0.5">
       <legend className="sr-only">{m["nav.language"]({}, { locale })}</legend>

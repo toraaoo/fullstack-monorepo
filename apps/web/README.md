@@ -34,11 +34,13 @@ src/
   lib/
     api/client.ts     Memoised clients, one per locale per side
     env.ts            Zod-parsed NEXT_PUBLIC_API_URL and API_URL
-    i18n/server.ts    getServerLocale(), memoised per request
+    i18n/client.tsx   LocaleProvider and useLocale() for Client Components
+    i18n/header.ts    The header proxy.ts hands the locale over in
+    i18n/server.ts    getServerLocale(), which sets the per-request locale
     paraglide/        Generated, git-ignored, never edited by hand
     query/client.ts   QueryClient factory
     typography.ts     Shared class strings
-  proxy.ts            Sets the locale cookie when it is missing
+  proxy.ts            Detects the locale, forwards it, persists the cookie
 ```
 
 ---
@@ -117,17 +119,22 @@ treats `network` and `timeout` as "unreachable" and everything else as a real an
 Locales are `en` (base) and `ko`. Resolution is cookie-first, then `Accept-Language`,
 then the base locale; it never appears in the URL, so there is no `[locale]` segment.
 
-**The locale is always passed explicitly.** Server Components resolve it once with
-`await getServerLocale()`, Client Components take it as a prop, and every message call
-names it:
+`proxy.ts` detects the locale with Paraglide's `paraglideMiddleware` and forwards it as a
+request header. Server Components call messages bare once their entry point has awaited
+`getServerLocale()`:
 
 ```tsx
-m["home.title"]({}, { locale })
+m["home.title"]()
 ```
 
-`getLocale()` is synchronous and Next 16 exposes the request only asynchronously, so
-there is no correct global for a Server Component to read. Explicit locale is the only
-form that is right in the server pass, the client's server-render pass and the browser.
+Client Components take the locale from `useLocale()` and pass it per call:
+
+```tsx
+m["nav.theme"]({}, { locale })
+```
+
+The split, and why a Client Component cannot read the server's locale, is explained in
+[i18n](../../docs/i18n.md#how-a-message-finds-the-locale).
 
 Adding a locale, adding a namespace and the shared validation keys are covered in
 [i18n](../../docs/i18n.md).
@@ -164,7 +171,8 @@ treatment reads badly in Hangul.
 ## Adding a page
 
 1. Create the route under `src/app/`.
-2. Resolve the locale with `await getServerLocale()` and pass it down.
+2. Await `getServerLocale()` at the top of the page, and of its `generateMetadata` if it
+   has one, then call messages bare.
 3. Add copy to `messages/<locale>/<namespace>.json`; register a new namespace in
    `project.inlang/settings.json`.
 4. Prefetch with `getServerApiClient(locale)` and wrap the client subtree in

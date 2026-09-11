@@ -8,6 +8,7 @@ import { Button } from "@workspace/ui/components/button"
 import { cn } from "@workspace/ui/lib/utils"
 import * as React from "react"
 import { getApiClient } from "@/lib/api/client"
+import { useLocale } from "@/lib/i18n/client"
 import { m } from "@/lib/paraglide/messages"
 import type { Locale } from "@/lib/paraglide/runtime"
 import { MICRO_LABEL } from "@/lib/typography"
@@ -21,7 +22,8 @@ const STATE_TONE: Record<ProbeState, string> = {
   unknown: "bg-amber-500",
 }
 
-export function SystemStatus({ locale }: { locale: Locale }) {
+export function SystemStatus() {
+  const locale = useLocale()
   const client = getApiClient(locale)
   const query = useQuery(healthQueries.check(client))
   const [refreshing, setRefreshing] = React.useState(false)

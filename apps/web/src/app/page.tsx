@@ -31,7 +31,7 @@ export default async function Page() {
           )}
         >
           <span aria-hidden className="h-px w-6 bg-border" />
-          {m["home.eyebrow"]({}, { locale })}
+          {m["home.eyebrow"]()}
         </p>
 
         <h1
@@ -40,11 +40,11 @@ export default async function Page() {
             DISPLAY_TEXT
           )}
         >
-          {m["home.title"]({}, { locale })}
+          {m["home.title"]()}
         </h1>
 
         <p className="mt-6 max-w-2xl text-pretty break-keep text-base text-muted-foreground leading-relaxed sm:text-lg">
-          {m["home.lede"]({}, { locale })}
+          {m["home.lede"]()}
         </p>
 
         <div className="mt-8 flex flex-wrap items-center gap-2.5">
@@ -59,7 +59,7 @@ export default async function Page() {
               />
             }
           >
-            {m["home.cta.docs"]({}, { locale })}
+            {m["home.cta.docs"]()}
             <ArrowUpRightIcon weight="bold" />
           </Button>
           <Button
@@ -68,7 +68,7 @@ export default async function Page() {
             nativeButton={false}
             render={<a href="#stack" />}
           >
-            {m["home.cta.repo"]({}, { locale })}
+            {m["home.cta.repo"]()}
           </Button>
         </div>
       </section>
@@ -76,7 +76,7 @@ export default async function Page() {
       <div className="grid gap-6 lg:grid-cols-5">
         <HydrationBoundary state={dehydrate(queryClient)}>
           <div className="lg:col-span-3">
-            <SystemStatus locale={locale} />
+            <SystemStatus />
           </div>
         </HydrationBoundary>
 
@@ -86,19 +86,19 @@ export default async function Page() {
         >
           <div className="space-y-2">
             <h2 id="access-heading" className="font-medium text-sm">
-              {m["access.heading"]({}, { locale })}
+              {m["access.heading"]()}
             </h2>
             <p className="break-keep text-muted-foreground text-sm leading-relaxed">
-              {m["access.lede"]({}, { locale })}
+              {m["access.lede"]()}
             </p>
           </div>
 
-          <AccessForm locale={locale} />
+          <AccessForm />
         </section>
       </div>
 
       <div className="pt-16">
-        <StackManifest locale={locale} />
+        <StackManifest />
       </div>
     </>
   )

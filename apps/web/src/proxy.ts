@@ -1,26 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server"
-import {
-  cookieMaxAge,
-  cookieName,
-  extractLocaleFromRequest,
-  isLocale,
-} from "@/lib/paraglide/runtime"
+import { LOCALE_HEADER } from "@/lib/i18n/header"
+import { cookieMaxAge, cookieName } from "@/lib/paraglide/runtime"
+import { paraglideMiddleware } from "@/lib/paraglide/server"
 
 export function proxy(request: NextRequest) {
-  const response = NextResponse.next()
-  const current = request.cookies.get(cookieName)?.value
+  return paraglideMiddleware(request, async ({ request: resolved, locale }) => {
+    const headers = new Headers(resolved.headers)
+    headers.set(LOCALE_HEADER, locale)
 
-  if (current && isLocale(current)) {
+    const response = NextResponse.next({ request: { headers } })
+
+    if (request.cookies.get(cookieName)?.value !== locale) {
+      response.cookies.set(cookieName, locale, {
+        path: "/",
+        maxAge: cookieMaxAge,
+        sameSite: "lax",
+      })
+    }
+
     return response
-  }
-
-  response.cookies.set(cookieName, extractLocaleFromRequest(request), {
-    path: "/",
-    maxAge: cookieMaxAge,
-    sameSite: "lax",
   })
-
-  return response
 }
 
 export const config = {

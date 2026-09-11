@@ -110,7 +110,7 @@ apps/
       app/                  App Router
       components/
       lib/paraglide/        Generated, git-ignored, never edited by hand
-      proxy.ts              Sets the locale cookie
+      proxy.ts              Detects and forwards the locale
 packages/
   ui/                       Shared shadcn/ui library (@workspace/ui)
   client/                   Typed API client (@workspace/client) · README

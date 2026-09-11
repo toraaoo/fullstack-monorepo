@@ -3,10 +3,11 @@
 import { MoonIcon, SunIcon } from "@phosphor-icons/react"
 import { Button } from "@workspace/ui/components/button"
 import { useTheme } from "next-themes"
+import { useLocale } from "@/lib/i18n/client"
 import { m } from "@/lib/paraglide/messages"
-import type { Locale } from "@/lib/paraglide/runtime"
 
-export function ThemeToggle({ locale }: { locale: Locale }) {
+export function ThemeToggle() {
+  const locale = useLocale()
   const { resolvedTheme, setTheme } = useTheme()
   const label = m["nav.theme"]({}, { locale })
 

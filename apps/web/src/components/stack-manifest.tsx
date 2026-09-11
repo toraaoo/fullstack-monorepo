@@ -1,6 +1,5 @@
 import { cn } from "@workspace/ui/lib/utils"
 import { m } from "@/lib/paraglide/messages"
-import type { Locale } from "@/lib/paraglide/runtime"
 import { MICRO_LABEL } from "@/lib/typography"
 
 const ROWS = [
@@ -14,7 +13,7 @@ const ROWS = [
   { role: "stack.role.tooling", parts: ["Turborepo", "Bun", "Biome"] },
 ] as const
 
-export function StackManifest({ locale }: { locale: Locale }) {
+export function StackManifest() {
   return (
     <section
       aria-labelledby="stack-heading"
@@ -25,7 +24,7 @@ export function StackManifest({ locale }: { locale: Locale }) {
         id="stack-heading"
         className={cn("text-muted-foreground", MICRO_LABEL)}
       >
-        {m["stack.heading"]({}, { locale })}
+        {m["stack.heading"]()}
       </h2>
 
       <dl className="mt-5 grid gap-x-12 border-border/70 border-t sm:grid-cols-2">
@@ -40,7 +39,7 @@ export function StackManifest({ locale }: { locale: Locale }) {
                 MICRO_LABEL
               )}
             >
-              {m[row.role]({}, { locale })}
+              {m[row.role]()}
             </dt>
             <dd className="min-w-0 flex-1 text-[0.9375rem]">
               {row.parts.map((part, index) => (
